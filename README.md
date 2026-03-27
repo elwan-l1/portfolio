@@ -1,22 +1,36 @@
-# Portfolio V3
->👋 Hi there! Welcome to my portfolio's readme file!
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## 🎨 Design
+## Getting Started
 
-My portfolio was designed using [![React](https://img.shields.io/badge/-React-61dafb?logo=react&logoColor=white&style=flat)](https://reactjs.org/), [![TypeScript](https://img.shields.io/badge/-TypeScript-007acc?logo=typescript&logoColor=white&style=flat)](https://www.typescriptlang.org/), [![Tailwind CSS](https://img.shields.io/badge/-Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white&style=flat)](https://tailwindcss.com/), and [![Three.js](https://img.shields.io/badge/-Three.js-black?logo=three.js&logoColor=white&style=flat)](https://threejs.org/). It also features 3D elements using [![Spline](https://img.shields.io/badge/-Spline-FF5C8D?logo=spline&logoColor=white&style=flat)](https://spline.design/).
+First, run the development server:
 
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## 🚀 Todo
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- [ ] 🪐 Add spatial audio 
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## ⏳ Time Tracking
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-[![wakatime](https://wakatime.com/badge/user/ee872f10-6167-41c6-8aad-e80d7519df4c/project/d6a7f038-caa9-4919-b1c6-d3fea1b31e08.svg)](https://wakatime.com/badge/user/ee872f10-6167-41c6-8aad-e80d7519df4c/project/d6a7f038-caa9-4919-b1c6-d3fea1b31e08)
+## Learn More
 
-## 🤝Contributing
+To learn more about Next.js, take a look at the following resources:
 
-Im open to contributions! If you'd like to contribute, please create a pull request and I'll review it as soon as I can.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## 📝 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
