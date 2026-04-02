@@ -1,4 +1,5 @@
-import { getDictionary, hasLocale } from "./dictionaries";
+import { hasLocale } from "./dictionaries";
+import PortfolioHome from "./portfolio-home";
 import { notFound } from "next/navigation";
 
 export default async function Page({ params }: PageProps<"/[lang]">) {
@@ -6,6 +7,5 @@ export default async function Page({ params }: PageProps<"/[lang]">) {
 
   if (!hasLocale(lang)) notFound();
 
-  const dict = await getDictionary(lang);
-  return <button>{dict.hello}</button>;
+  return <PortfolioHome currentLang={lang} />;
 }
