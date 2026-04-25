@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@chenglou/pretext": "^0.0.6",
     "@formatjs/intl-localematcher": "^0.8.2",
     "@gsap/react": "^2.1.2",
     "class-variance-authority": "^0.7.1",
