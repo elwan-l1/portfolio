@@ -37,6 +37,6 @@ export const proxy = (request: NextRequest) => {
 
 export const config = {
   matcher: [
-    "/((?!_next|favicon.ico|robots.txt|sitemap|static|logo.svg|left.svg|right.svg|images/|icons/).*)",
+    "/((?!_next|.*\\..*|robots.txt|sitemap|static|images/|icons/).*)",
   ],
 };

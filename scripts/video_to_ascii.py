@@ -1,29 +1,36 @@
-# /// script
-# requires-python = ">=3.10"
-# dependencies = [
-#   "numpy>=1.26",
-#   "opencv-python-headless>=4.9",
-# ]
-# ///
-"""Convert every frame of a video into ASCII art or a TypeScript module."""
+"""Convert a video into two Brotli-compressed ASCII payloads."""
 
 from __future__ import annotations
 
 import argparse
-import json
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
 import cv2
 import numpy as np
 
+try:
+    import brotli
+except ImportError:
+    brotli = None
+
 
 DEFAULT_WIDTH = 160
 DEFAULT_HEIGHT = 58
-DEFAULT_CHARSET = "@%#*+=-:. "
-DEFAULT_CHARSET_HELP = DEFAULT_CHARSET.replace("%", "%%")
-DEFAULT_TS_CONSTANT_NAME = "ASCII_VIDEO_FRAMES"
-DEFAULT_TS_FPS = 24
+DEFAULT_FPS = 24
+SMOOTH_CHARSET = "@%#*+=-:. "
+
+DEFAULT_EQUALIZE = "none"
+DEFAULT_CLAHE_CLIP_LIMIT = 2.0
+DEFAULT_CLAHE_GRID_SIZE = 8
+DEFAULT_EDGE_THRESHOLD = 0.0
+DEFAULT_OPACITY_LEVELS = 16
+DEFAULT_OPACITY_GAMMA = 1.0
+
+OPACITY_DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz"
+BROTLI_EXTENSION = "br"
 
 
 def positive_int(value: str) -> int:
@@ -37,104 +44,168 @@ def positive_int(value: str) -> int:
     return parsed
 
 
-def frame_to_ascii(
+def positive_float(value: str) -> float:
+    try:
+        parsed = float(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"{value!r} is not a number") from exc
+
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("value must be greater than 0")
+    return parsed
+
+
+def gamma_lookup_table(gamma: float) -> np.ndarray | None:
+    if gamma == 1:
+        return None
+
+    return np.array(
+        [np.clip(pow(index / 255.0, gamma) * 255.0, 0, 255) for index in range(256)],
+        dtype=np.uint8,
+    )
+
+
+def process_gray_frame(
     frame: np.ndarray,
     *,
     width: int,
     height: int,
-    charset: str,
-) -> str:
+    clahe: cv2.CLAHE | None,
+    gamma_table: np.ndarray | None,
+    contrast: float,
+    brightness: int,
+) -> np.ndarray:
     resized = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
     gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 
-    scale = (len(charset) - 1) / 255
-    indexes = np.rint(gray * scale).astype(np.int16)
-    lines = ("".join(charset[index] for index in row) for row in indexes)
+    if DEFAULT_EQUALIZE == "hist":
+        gray = cv2.equalizeHist(gray)
+    elif DEFAULT_EQUALIZE == "clahe":
+        if clahe is None:
+            raise RuntimeError("CLAHE was not initialized.")
+        gray = clahe.apply(gray)
+
+    if gamma_table is not None:
+        gray = cv2.LUT(gray, gamma_table)
+
+    if contrast != 1 or brightness != 0:
+        gray = cv2.convertScaleAbs(gray, alpha=contrast, beta=brightness)
+
+    return gray
+
+
+def edge_glyphs(gray: np.ndarray, threshold: float) -> np.ndarray:
+    sobel_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
+    sobel_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
+    magnitude = cv2.magnitude(sobel_x, sobel_y)
+    tangent = (np.rad2deg(np.arctan2(sobel_y, sobel_x)) + 90) % 180
+    glyphs = np.full(gray.shape, "", dtype="<U1")
+    edge_mask = magnitude >= threshold
+
+    glyphs[edge_mask & ((tangent < 22.5) | (tangent >= 157.5))] = "-"
+    glyphs[edge_mask & (tangent >= 22.5) & (tangent < 67.5)] = "/"
+    glyphs[edge_mask & (tangent >= 67.5) & (tangent < 112.5)] = "|"
+    glyphs[edge_mask & (tangent >= 112.5) & (tangent < 157.5)] = "\\"
+
+    return glyphs
+
+
+def opacity_frame(gray: np.ndarray, *, invert: bool) -> str:
+    ink = gray if invert else 255 - gray
+    normalized = ink.astype(np.float32) / 255
+
+    if DEFAULT_OPACITY_GAMMA != 1:
+        normalized = np.power(normalized, DEFAULT_OPACITY_GAMMA)
+
+    indexes = np.rint(normalized * (DEFAULT_OPACITY_LEVELS - 1)).astype(np.int16)
+    lines = ("".join(OPACITY_DIGITS[index] for index in row) for row in indexes)
     return "\n".join(lines)
+
+
+def frame_to_ascii_assets(
+    frame: np.ndarray,
+    *,
+    width: int,
+    height: int,
+    invert: bool,
+    clahe: cv2.CLAHE | None,
+    gamma_table: np.ndarray | None,
+    contrast: float,
+    brightness: int,
+) -> tuple[str, str]:
+    gray = process_gray_frame(
+        frame,
+        width=width,
+        height=height,
+        clahe=clahe,
+        gamma_table=gamma_table,
+        contrast=contrast,
+        brightness=brightness,
+    )
+
+    scale = (len(SMOOTH_CHARSET) - 1) / 255
+    indexes = np.rint(gray * scale).astype(np.int16)
+    characters = np.array(tuple(SMOOTH_CHARSET), dtype="<U1")[indexes]
+
+    if DEFAULT_EDGE_THRESHOLD > 0:
+        edge_base = gray if invert else 255 - gray
+        edges = edge_glyphs(edge_base, DEFAULT_EDGE_THRESHOLD)
+        edge_mask = edges != ""
+        characters[edge_mask] = edges[edge_mask]
+
+    ascii_frame = "\n".join("".join(row) for row in characters)
+    alpha_frame = opacity_frame(gray, invert=invert)
+    return ascii_frame, alpha_frame
 
 
 def default_output_path(input_path: Path) -> Path:
     return input_path.with_name(f"{input_path.stem}_ascii.txt")
 
 
-def default_typescript_output_path(input_path: Path) -> Path:
-    return input_path.with_name(f"{input_path.stem}_ascii.ts")
+def opacity_output_path_for(output_path: Path) -> Path:
+    return output_path.with_name(f"{output_path.stem}-opacity{output_path.suffix}")
 
 
-def typescript_string(value: str) -> str:
-    return json.dumps(value, ensure_ascii=True)
+def brotli_compress(data: bytes) -> bytes:
+    if brotli is not None:
+        return brotli.compress(data, quality=11)
 
+    brotli_path = shutil.which("brotli")
+    if brotli_path is None:
+        raise RuntimeError("Brotli compression requires the brotli package or CLI.")
 
-def write_text_frame(
-    output_file,
-    *,
-    ascii_frame: str,
-    frame_number: int,
-    fps: float,
-    total_frames: int,
-    no_headers: bool,
-) -> None:
-    if frame_number:
-        output_file.write("\n\n")
-
-    if not no_headers:
-        timestamp = frame_number / fps if fps else 0
-        output_file.write(
-            f"--- frame {frame_number + 1}"
-            f"{f'/{total_frames}' if total_frames else ''}"
-            f" time={timestamp:.3f}s ---\n"
-        )
-
-    output_file.write(ascii_frame)
-
-
-def write_typescript_module(
-    output_path: Path,
-    *,
-    frames: list[str],
-    width: int,
-    height: int,
-    fps: int,
-    constant_name: str,
-) -> None:
-    frame_values = ",\n".join(f"  {typescript_string(frame)}" for frame in frames)
-    output_path.write_text(
-        "\n".join(
-            [
-                "// This file is generated by scripts/video_to_ascii.py.",
-                "",
-                f"export const ASCII_VIDEO_WIDTH = {width} as const;",
-                f"export const ASCII_VIDEO_HEIGHT = {height} as const;",
-                f"export const ASCII_VIDEO_FPS = {fps} as const;",
-                f"export const {constant_name} = [",
-                frame_values,
-                "] as const;",
-                "",
-                f"export type AsciiVideoFrame = (typeof {constant_name})[number];",
-                "",
-            ]
-        ),
-        encoding="utf-8",
-        newline="\n",
+    result = subprocess.run(
+        [brotli_path, "-q", "11", "--stdout"],
+        input=data,
+        capture_output=True,
+        check=True,
     )
+    return result.stdout
+
+
+def write_brotli_payload(path: Path, data: bytes) -> Path:
+    compressed_path = path.with_suffix(f"{path.suffix}.{BROTLI_EXTENSION}")
+    compressed_path.parent.mkdir(parents=True, exist_ok=True)
+    compressed_path.write_bytes(brotli_compress(data))
+    return compressed_path
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Convert every frame of an MP4/video file to ASCII art.",
+        description="Convert every frame of a video into Brotli-compressed ASCII payloads.",
     )
-    parser.add_argument("input", type=Path, help="Input video path, for example video.mp4")
+    parser.add_argument(
+        "input", type=Path, help="Input video path, for example video.mp4"
+    )
     parser.add_argument(
         "-o",
         "--output",
+        required=True,
         type=Path,
-        help="Output path. Defaults to <input>_ascii.txt or <input>_ascii.ts.",
-    )
-    parser.add_argument(
-        "--format",
-        choices=("txt", "ts"),
-        default="txt",
-        help="Output format. Use 'ts' to generate an importable TypeScript module.",
+        help=(
+            "Output base path for character payload. "
+            "Writes <output>.br and <output-stem>-opacity<suffix>.br."
+        ),
     )
     parser.add_argument(
         "--width",
@@ -149,41 +220,33 @@ def parse_args() -> argparse.Namespace:
         help=f"Output frame height in characters. Default: {DEFAULT_HEIGHT}",
     )
     parser.add_argument(
-        "--charset",
-        default=DEFAULT_CHARSET,
-        help=(
-            "Characters from darkest to lightest. "
-            f"Default: {DEFAULT_CHARSET_HELP!r}"
-        ),
-    )
-    parser.add_argument(
         "--invert",
         action="store_true",
-        help="Reverse the charset so light pixels use dense characters.",
+        help="Reverse the smooth charset so light pixels use denser characters.",
     )
     parser.add_argument(
-        "--no-headers",
-        action="store_true",
-        help="Write only ASCII frames, without frame/time separator headers.",
+        "--contrast",
+        type=positive_float,
+        default=1.0,
+        help="Contrast multiplier before ASCII mapping. Default: 1.0",
     )
     parser.add_argument(
-        "--max-frames",
-        type=positive_int,
-        help="Stop after this many frames. Useful for quick tests.",
+        "--brightness",
+        type=int,
+        default=0,
+        help="Brightness offset before ASCII mapping. Default: 0",
+    )
+    parser.add_argument(
+        "--gamma",
+        type=positive_float,
+        default=1.0,
+        help="Gamma correction before ASCII mapping. Default: 1.0",
     )
     parser.add_argument(
         "--fps",
         type=positive_int,
-        default=DEFAULT_TS_FPS,
-        help=f"Playback FPS to export in TypeScript mode. Default: {DEFAULT_TS_FPS}",
-    )
-    parser.add_argument(
-        "--constant-name",
-        default=DEFAULT_TS_CONSTANT_NAME,
-        help=(
-            "Name of the exported frame array in TypeScript mode. "
-            f"Default: {DEFAULT_TS_CONSTANT_NAME}"
-        ),
+        default=DEFAULT_FPS,
+        help=f"Playback FPS reference. Default: {DEFAULT_FPS}",
     )
     return parser.parse_args()
 
@@ -191,22 +254,17 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     input_path = args.input.expanduser().resolve()
-    output_path = (
-        args.output
-        or (
-            default_typescript_output_path(input_path)
-            if args.format == "ts"
-            else default_output_path(input_path)
-        )
-    ).expanduser().resolve()
+    output_path = args.output.expanduser().resolve()
 
     if not input_path.exists():
         print(f"Input video does not exist: {input_path}", file=sys.stderr)
         return 1
 
-    charset = args.charset[::-1] if args.invert else args.charset
-    if len(charset) < 2:
-        print("Charset must contain at least two characters.", file=sys.stderr)
+    if DEFAULT_OPACITY_LEVELS > len(OPACITY_DIGITS):
+        print(
+            f"Opacity levels must be at most {len(OPACITY_DIGITS)}.",
+            file=sys.stderr,
+        )
         return 1
 
     capture = cv2.VideoCapture(str(input_path))
@@ -214,61 +272,37 @@ def main() -> int:
         print(f"Could not open video: {input_path}", file=sys.stderr)
         return 1
 
-    fps = capture.get(cv2.CAP_PROP_FPS) or 0
-    total_frames = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    gamma_table = gamma_lookup_table(args.gamma)
+    clahe = None
+    if DEFAULT_EQUALIZE == "clahe":
+        clahe = cv2.createCLAHE(
+            clipLimit=DEFAULT_CLAHE_CLIP_LIMIT,
+            tileGridSize=(DEFAULT_CLAHE_GRID_SIZE, DEFAULT_CLAHE_GRID_SIZE),
+        )
 
     frame_number = 0
+    ascii_frames: list[str] = []
+    opacity_frames: list[str] = []
     try:
-        ts_frames: list[str] = []
-        output_file = None
-        if args.format == "txt":
-            output_file = output_path.open("w", encoding="utf-8", newline="\n")
+        while True:
+            ok, frame = capture.read()
+            if not ok:
+                break
 
-        try:
-            while True:
-                ok, frame = capture.read()
-                if not ok:
-                    break
+            ascii_frame, opacity_frame_value = frame_to_ascii_assets(
+                frame,
+                width=args.width,
+                height=args.height,
+                invert=args.invert,
+                clahe=clahe,
+                gamma_table=gamma_table,
+                contrast=args.contrast,
+                brightness=args.brightness,
+            )
+            ascii_frames.append(ascii_frame)
+            opacity_frames.append(opacity_frame_value)
+            frame_number += 1
 
-                if args.max_frames is not None and frame_number >= args.max_frames:
-                    break
-
-                ascii_frame = frame_to_ascii(
-                    frame,
-                    width=args.width,
-                    height=args.height,
-                    charset=charset,
-                )
-
-                if args.format == "ts":
-                    ts_frames.append(ascii_frame)
-                else:
-                    if output_file is None:
-                        raise RuntimeError("Text output file is not open.")
-                    write_text_frame(
-                        output_file,
-                        ascii_frame=ascii_frame,
-                        frame_number=frame_number,
-                        fps=fps,
-                        total_frames=total_frames,
-                        no_headers=args.no_headers,
-                    )
-
-                frame_number += 1
-
-            if args.format == "ts":
-                write_typescript_module(
-                    output_path,
-                    frames=ts_frames,
-                    width=args.width,
-                    height=args.height,
-                    fps=args.fps,
-                    constant_name=args.constant_name,
-                )
-        finally:
-            if output_file is not None:
-                output_file.close()
     finally:
         capture.release()
 
@@ -276,7 +310,26 @@ def main() -> int:
         print("No frames were read from the video.", file=sys.stderr)
         return 1
 
-    print(f"Wrote {frame_number} frame(s) to {output_path}")
+    ascii_data = "".join(frame.replace("\n", "") for frame in ascii_frames).encode(
+        "utf-8"
+    )
+    opacity_data = "".join(frame.replace("\n", "") for frame in opacity_frames).encode(
+        "utf-8"
+    )
+    expected_size = frame_number * args.width * args.height
+
+    if len(ascii_data) != expected_size or len(opacity_data) != expected_size:
+        print("Generated payload size mismatch.", file=sys.stderr)
+        return 1
+
+    opacity_output_path = opacity_output_path_for(output_path)
+    ascii_brotli_path = write_brotli_payload(output_path, ascii_data)
+    opacity_brotli_path = write_brotli_payload(opacity_output_path, opacity_data)
+
+    print(f"Wrote {frame_number} frame(s)")
+    print(f"Chars payload: {ascii_brotli_path}")
+    print(f"Opacity payload: {opacity_brotli_path}")
+    print(f"FPS reference: {args.fps}")
     return 0
 
 

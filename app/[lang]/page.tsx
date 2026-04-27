@@ -1,4 +1,5 @@
 import { AsciiVideoPlayer } from "@/components/ascii-video-player";
+import TerminalCard from "@/components/terminal-card";
 
 import { hasLocale } from "./dictionaries";
 import { notFound } from "next/navigation";
@@ -11,7 +12,9 @@ export default async function Page({ params }: PageProps<"/[lang]">) {
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
       <div className="flex min-h-screen items-center justify-center p-4">
-        <AsciiVideoPlayer />
+        <TerminalCard>
+          <AsciiVideoPlayer />
+        </TerminalCard>
       </div>
     </main>
   );

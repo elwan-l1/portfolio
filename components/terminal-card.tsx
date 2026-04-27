@@ -18,7 +18,7 @@ const TerminalCard = ({
   return (
     <div
       className={cn(
-        `relative w-full h-full border border-white bg-black text-white`,
+        `relative w-250 h-150 border-[0.5px] rounded-md border-white bg-black text-white`,
         className,
       )}
     >
