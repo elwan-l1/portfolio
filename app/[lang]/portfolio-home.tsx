@@ -111,9 +111,9 @@ const PortfolioHome = ({ currentLang }: PortfolioHomeProps) => {
   return (
     <main
       ref={containerRef}
-      className="relative h-[100svh] max-h-screen overflow-hidden  bg-black text-white"
+      className="relative h-[100svh] max-h-screen overflow-hidden bg-black text-white"
     >
-      <div className="absolute right-6 top-6 flex items-center gap-3 text-sm uppercase tracking-[0.25em] text-white/80">
+      <div className="absolute top-6 right-6 flex items-center gap-3 text-sm tracking-[0.25em] text-white/80 uppercase">
         {LANGUAGES.map((lang, i) => {
           const active = lang === currentLang;
 
@@ -121,20 +121,16 @@ const PortfolioHome = ({ currentLang }: PortfolioHomeProps) => {
             <div key={lang} className="flex items-center gap-3">
               <Link
                 href={`/${lang}`}
-                className={
-                  active ? "opacity-100" : "opacity-50 hover:opacity-100"
-                }
+                className={active ? "opacity-100" : "opacity-50 hover:opacity-100"}
               >
                 {lang}
               </Link>
-              {i < LANGUAGES.length - 1 && (
-                <span className="opacity-30">|</span>
-              )}
+              {i < LANGUAGES.length - 1 && <span className="opacity-30">|</span>}
             </div>
           );
         })}
       </div>
-      <div className="flex justify-center items-center h-full">
+      <div className="flex h-full items-center justify-center">
         <Cool></Cool>
       </div>
       {/* <DepthCard>

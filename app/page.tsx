@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 
 export default function ThemePreview() {
   return (
-    <div className="min-h-screen bg-background text-foreground p-10 space-y-10">
+    <div className="bg-background text-foreground min-h-screen space-y-10 p-10">
       {/* SECTION: Typography */}
       <section className="space-y-2">
         <h1 className="text-4xl font-bold">Theme Preview</h1>
@@ -23,7 +23,7 @@ export default function ThemePreview() {
       </section>
 
       {/* SECTION: Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card className="bg-card text-card-foreground border-border">
           <CardHeader>
             <CardTitle>Card</CardTitle>
@@ -49,7 +49,7 @@ export default function ThemePreview() {
       </section>
 
       {/* SECTION: Inputs */}
-      <section className="space-y-4 max-w-md">
+      <section className="max-w-md space-y-4">
         <Input placeholder="Input (input / border / ring)" />
         <div className="flex gap-2">
           <Button>Submit</Button>
@@ -58,27 +58,27 @@ export default function ThemePreview() {
       </section>
 
       {/* SECTION: Muted */}
-      <section className="p-6 bg-muted text-muted-foreground rounded-lg">
+      <section className="bg-muted text-muted-foreground rounded-lg p-6">
         This is muted background with muted-foreground text.
       </section>
 
       {/* SECTION: Destructive */}
-      <section className="p-6 bg-destructive text-white rounded-lg">
+      <section className="bg-destructive rounded-lg p-6 text-white">
         Destructive color (error / danger)
       </section>
 
       {/* SECTION: Borders */}
-      <section className="p-6 border border-border rounded-lg">
+      <section className="border-border rounded-lg border p-6">
         This shows your border color
       </section>
 
       {/* SECTION: Sidebar */}
       <section className="flex">
-        <div className="w-64 p-4 bg-sidebar text-sidebar-foreground border-r border-sidebar-border space-y-4">
-          <div className="p-2 bg-sidebar-primary text-sidebar-primary-foreground rounded">
+        <div className="bg-sidebar text-sidebar-foreground border-sidebar-border w-64 space-y-4 border-r p-4">
+          <div className="bg-sidebar-primary text-sidebar-primary-foreground rounded p-2">
             Sidebar Primary
           </div>
-          <div className="p-2 bg-sidebar-accent text-sidebar-accent-foreground rounded">
+          <div className="bg-sidebar-accent text-sidebar-accent-foreground rounded p-2">
             Sidebar Accent
           </div>
         </div>
@@ -88,11 +88,11 @@ export default function ThemePreview() {
 
       {/* SECTION: Chart Colors */}
       <section className="flex gap-4">
-        <div className="w-16 h-16 rounded bg-[hsl(var(--chart-1))]" />
-        <div className="w-16 h-16 rounded bg-[hsl(var(--chart-2))]" />
-        <div className="w-16 h-16 rounded bg-[hsl(var(--chart-3))]" />
-        <div className="w-16 h-16 rounded bg-[hsl(var(--chart-4))]" />
-        <div className="w-16 h-16 rounded bg-[hsl(var(--chart-5))]" />
+        <div className="h-16 w-16 rounded bg-[hsl(var(--chart-1))]" />
+        <div className="h-16 w-16 rounded bg-[hsl(var(--chart-2))]" />
+        <div className="h-16 w-16 rounded bg-[hsl(var(--chart-3))]" />
+        <div className="h-16 w-16 rounded bg-[hsl(var(--chart-4))]" />
+        <div className="h-16 w-16 rounded bg-[hsl(var(--chart-5))]" />
       </section>
     </div>
   );

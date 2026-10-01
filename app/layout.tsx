@@ -18,8 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: `Portfolio V${VERSION}`,
-  description:
-    "Hey, welcome to my portfolio! I'm a software engineer that do things.",
+  description: "Hey, welcome to my portfolio! I'm a software engineer that do things.",
 };
 
 export default function RootLayout({
@@ -40,7 +39,7 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

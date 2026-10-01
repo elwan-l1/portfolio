@@ -9,9 +9,7 @@ const ASCII_VIDEO_HEIGHT = 58;
 const ASCII_VIDEO_FPS = 24;
 const ASCII_VIDEO_OPACITY_LEVELS = 16;
 const ASCII_VIDEO_FRAME_SIZE = ASCII_VIDEO_WIDTH * ASCII_VIDEO_HEIGHT;
-const ASCII_VIDEO_SOURCES = [
-  { url: "/ascii-video.txt.br", compression: "brotli" },
-] as const;
+const ASCII_VIDEO_SOURCES = [{ url: "/ascii-video.txt.br", compression: "brotli" }] as const;
 const ASCII_VIDEO_OPACITY_SOURCES = [
   { url: "/ascii-video-opacity.txt.br", compression: "brotli" },
 ] as const;
@@ -24,8 +22,7 @@ const ASCII_FONT_SIZE = 12;
 const ASCII_LINE_HEIGHT = 9;
 const ASCII_LETTER_SPACING = -1;
 
-const ASCII_FONT_FAMILY =
-  'Consolas, "Liberation Mono", "Courier New", monospace';
+const ASCII_FONT_FAMILY = 'Consolas, "Liberation Mono", "Courier New", monospace';
 
 const ASCII_FONT = `${ASCII_FONT_SIZE}px ${ASCII_FONT_FAMILY}`;
 
@@ -48,7 +45,7 @@ type AsciiVideoSource = {
 
 type CompressionFormat = ConstructorParameters<typeof DecompressionStream>[0];
 type BrotliModule = {
-  brotliDec: (input: Uint8Array) => Uint8Array;
+  decompress: (input: Uint8Array) => Uint8Array;
 };
 
 let brotliModulePromise: Promise<BrotliModule> | null = null;
@@ -75,23 +72,18 @@ function canDecompress(compression: AsciiVideoSource["compression"]) {
 async function getBrotliModule() {
   if (brotliModulePromise) return brotliModulePromise;
 
-  brotliModulePromise = import("brotli-dec-wasm").then((module) => ({
-    brotliDec: module.brotliDec,
-  }));
+  brotliModulePromise = import("brotli-dec-wasm").then((module) => module.default);
 
   return brotliModulePromise;
 }
 
 async function decodeBrotli(bytes: Uint8Array) {
   const brotli = await getBrotliModule();
-  const decompressed = brotli.brotliDec(bytes);
+  const decompressed = brotli.decompress(bytes);
   return new TextDecoder().decode(decompressed);
 }
 
-async function readAsciiVideoPayload(
-  source: AsciiVideoSource,
-  signal: AbortSignal,
-) {
+async function readAsciiVideoPayload(source: AsciiVideoSource, signal: AbortSignal) {
   const response = await fetch(source.url, {
     cache: ASCII_VIDEO_FETCH_CACHE,
     signal,
@@ -128,10 +120,7 @@ async function readAsciiVideoPayload(
   throw new Error("Unsupported ASCII video compression.");
 }
 
-async function loadPayload(
-  sources: readonly AsciiVideoSource[],
-  signal: AbortSignal,
-) {
+async function loadPayload(sources: readonly AsciiVideoSource[], signal: AbortSignal) {
   let lastError: unknown;
 
   for (const source of sources) {
@@ -179,23 +168,15 @@ function measureAsciiWidth() {
     return getFallbackAsciiWidth();
   }
 
-  const prepared = prepareWithSegments(
-    "M".repeat(ASCII_VIDEO_WIDTH),
-    ASCII_FONT,
-    {
-      whiteSpace: "pre-wrap",
-      letterSpacing: ASCII_LETTER_SPACING,
-    },
-  );
+  const prepared = prepareWithSegments("M".repeat(ASCII_VIDEO_WIDTH), ASCII_FONT, {
+    whiteSpace: "pre-wrap",
+    letterSpacing: ASCII_LETTER_SPACING,
+  });
 
   return Math.ceil(measureNaturalWidth(prepared));
 }
 
-function updateAsciiVideoFrame(
-  rows: HTMLSpanElement[],
-  video: AsciiVideoData,
-  frameIndex: number,
-) {
+function updateAsciiVideoFrame(rows: HTMLSpanElement[], video: AsciiVideoData, frameIndex: number) {
   const start = frameIndex * ASCII_VIDEO_FRAME_SIZE;
   const end = start + ASCII_VIDEO_FRAME_SIZE;
 
@@ -205,10 +186,7 @@ function updateAsciiVideoFrame(
   for (let rowIndex = 0; rowIndex < ASCII_VIDEO_HEIGHT; rowIndex += 1) {
     const rowStart = rowIndex * ASCII_VIDEO_WIDTH;
     const row = frame.slice(rowStart, rowStart + ASCII_VIDEO_WIDTH);
-    const opacityRow = opacityFrame.slice(
-      rowStart,
-      rowStart + ASCII_VIDEO_WIDTH,
-    );
+    const opacityRow = opacityFrame.slice(rowStart, rowStart + ASCII_VIDEO_WIDTH);
 
     for (let level = 1; level < ASCII_VIDEO_OPACITY_LEVELS; level += 1) {
       const digit = OPACITY_DIGITS[level];
@@ -218,8 +196,7 @@ function updateAsciiVideoFrame(
         text += opacityRow[index] === digit ? row[index] : " ";
       }
 
-      const elementIndex =
-        rowIndex * (ASCII_VIDEO_OPACITY_LEVELS - 1) + (level - 1);
+      const elementIndex = rowIndex * (ASCII_VIDEO_OPACITY_LEVELS - 1) + (level - 1);
 
       const element = rows[elementIndex];
       if (element) element.textContent = text;
@@ -278,8 +255,7 @@ export function AsciiVideoPlayer() {
       if (!startedAt) startedAt = now;
 
       const elapsed = now - startedAt;
-      const nextFrameIndex =
-        Math.floor(elapsed / FRAME_DURATION_MS) % video.frameCount;
+      const nextFrameIndex = Math.floor(elapsed / FRAME_DURATION_MS) % video.frameCount;
 
       if (nextFrameIndex !== lastFrameIndex.current) {
         lastFrameIndex.current = nextFrameIndex;
@@ -311,33 +287,28 @@ export function AsciiVideoPlayer() {
       }}
     >
       {loadError ? (
-        <span className="absolute left-0 top-0 text-xs text-red-400">
-          {loadError}
-        </span>
+        <span className="absolute top-0 left-0 text-xs text-red-400">{loadError}</span>
       ) : null}
       {Array.from({ length: ASCII_VIDEO_HEIGHT }).map((_, rowIndex) =>
-        Array.from({ length: ASCII_VIDEO_OPACITY_LEVELS - 1 }).map(
-          (_, levelIndex) => {
-            const level = levelIndex + 1;
-            const refIndex =
-              rowIndex * (ASCII_VIDEO_OPACITY_LEVELS - 1) + levelIndex;
+        Array.from({ length: ASCII_VIDEO_OPACITY_LEVELS - 1 }).map((_, levelIndex) => {
+          const level = levelIndex + 1;
+          const refIndex = rowIndex * (ASCII_VIDEO_OPACITY_LEVELS - 1) + levelIndex;
 
-            return (
-              <span
-                key={`${rowIndex}-${level}`}
-                ref={(element) => {
-                  if (element) rowRefs.current[refIndex] = element;
-                }}
-                aria-hidden="true"
-                className="absolute left-0 block"
-                style={{
-                  top: rowIndex * ASCII_LINE_HEIGHT,
-                  opacity: opacityForLevel(level),
-                }}
-              />
-            );
-          },
-        ),
+          return (
+            <span
+              key={`${rowIndex}-${level}`}
+              ref={(element) => {
+                if (element) rowRefs.current[refIndex] = element;
+              }}
+              aria-hidden="true"
+              className="absolute left-0 block"
+              style={{
+                top: rowIndex * ASCII_LINE_HEIGHT,
+                opacity: opacityForLevel(level),
+              }}
+            />
+          );
+        }),
       )}
     </div>
   );

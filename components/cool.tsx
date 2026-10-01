@@ -403,7 +403,7 @@ export default function Cool({ className }: CoolProps) {
       <div className="relative size-80">
         <div
           id="impact-flash"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 blur-xl mix-blend-screen"
+          className="pointer-events-none absolute top-1/2 left-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 mix-blend-screen blur-xl"
         />
 
         <svg
@@ -504,29 +504,21 @@ export default function Cool({ className }: CoolProps) {
 
         <div
           id="terminal-shell"
-          className="pointer-events-none absolute left-1/2 top-1/2 z-20 aspect-square w-4 -translate-x-1/2 -translate-y-1/2 overflow-hidden opacity-0"
+          className="pointer-events-none absolute top-1/2 left-1/2 z-20 aspect-square w-4 -translate-x-1/2 -translate-y-1/2 overflow-hidden opacity-0"
         >
-          <div
-            className={cn(
-              "relative h-full w-full border-2 border-white bg-black text-white",
-            )}
-          >
-            <div className="absolute left-0 right-0 top-0 flex h-10 items-center justify-center">
+          <div className={cn("relative h-full w-full border-2 border-white bg-black text-white")}>
+            <div className="absolute top-0 right-0 left-0 flex h-10 items-center justify-center">
               <div className="absolute left-4 flex items-center gap-2">
                 <span className="h-3 w-3 rounded-full bg-[#ff5f56]" />
                 <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
                 <span className="h-3 w-3 rounded-full bg-[#27c93f]" />
               </div>
 
-              <div className="text-sm tracking-wide text-white/90">
-                👻 Ghostty
-              </div>
+              <div className="text-sm tracking-wide text-white/90">👻 Ghostty</div>
             </div>
 
             <div className="h-full w-full pt-10">
-              <div className="terminal-line px-6 text-sm">
-                Welcome to my portfolio!
-              </div>
+              <div className="terminal-line px-6 text-sm">Welcome to my portfolio!</div>
               <div className="terminal-line px-6 text-sm">
                 I'm a software engineer that do things.
               </div>

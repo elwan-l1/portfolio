@@ -92,23 +92,20 @@ export default function DepthCard() {
           className="will-change-transform"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <div
-            ref={cardRef}
-            className="relative flex h-[320px] w-[520px]  will-change-transform"
-          >
+          <div ref={cardRef} className="relative flex h-[320px] w-[520px] will-change-transform">
             <Image
               src="/left.svg"
               alt="Logo"
               width={200}
               height={200}
-              className="absolute -bottom-26 -left-26 z-10 "
+              className="absolute -bottom-26 -left-26 z-10"
             />
             <Image
               src="/right.svg"
               alt="Logo"
               width={200}
               height={200}
-              className="absolute -top-26 -right-26 z-10 "
+              className="absolute -top-26 -right-26 z-10"
             />
             <TerminalCard></TerminalCard>
           </div>

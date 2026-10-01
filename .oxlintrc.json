@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "nextjs", "import", "jsx-a11y"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "rules": {
+    "react/no-children-prop": "off",
+    "no-unused-vars": "warn"
+  },
+  "ignorePatterns": [".next/**", "out/**", "build/**", "next-env.d.ts", "components/ui/**"]
+}
