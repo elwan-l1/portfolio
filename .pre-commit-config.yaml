@@ -1,0 +1,68 @@
+minimum_pre_commit_version: "4.0.0"
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.9
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: oxfmt
+        name: oxfmt (format)
+        entry: node_modules/.bin/oxfmt --no-error-on-unmatched-pattern
+        language: system
+        types_or: [javascript, jsx, ts, tsx, json, css, markdown, yaml]
+      - id: oxlint
+        name: oxlint (lint)
+        entry: node_modules/.bin/oxlint --no-error-on-unmatched-pattern
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+      - id: tsc
+        name: tsc (typecheck)
+        entry: sh -c 'node_modules/.bin/next typegen && node_modules/.bin/tsc --noEmit'
+        language: system
+        types_or: [ts, tsx]
+        pass_filenames: false
+      - id: pnpm-lockfile
+        name: pnpm lockfile is up to date
+        entry: pnpm install --lockfile-only --frozen-lockfile
+        language: system
+        files: ^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$
+        pass_filenames: false
+      - id: uv-lockfile
+        name: uv lockfile is up to date
+        entry: uv lock --check --project scripts
+        language: system
+        files: ^scripts/(pyproject\.toml|uv\.lock)$
+        pass_filenames: false
