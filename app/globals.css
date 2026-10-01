@@ -11,6 +11,11 @@
   --text-head: clamp(21px, 2.9vh, 34px);
 }
 
+@theme inline {
+  --font-mono: var(--font-martian), var(--font-art), monospace;
+  --font-text: var(--font-art), monospace;
+}
+
 body {
   @apply bg-base text-text font-mono antialiased;
   font-variant-ligatures: none;
