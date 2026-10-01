@@ -5,7 +5,6 @@
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "components/ui/**",
     "pnpm-lock.yaml",
     "public/**",
     "assets/**"
@@ -14,7 +13,7 @@
     "newlinesBetween": true,
     "customGroups": [
       { "groupName": "react", "elementNamePattern": ["react"] },
-      { "groupName": "ui", "elementNamePattern": ["@/components/ui/**", "lucide-react"] },
+      { "groupName": "ui", "elementNamePattern": ["@/components/ui/**"] },
       { "groupName": "components", "elementNamePattern": ["@/components/**"] },
       {
         "groupName": "lib",

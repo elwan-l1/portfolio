@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-
 import "./globals.css";
 import { VERSION } from "@/constants/global";
 import type { Metadata } from "next";
@@ -29,15 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(
-        "h-full",
-        "dark",
-        "antialiased",
-        geistSans.variable,
-        geistMono.variable,
-        "font-sans",
-        inter.variable,
-      )}
+      className={`dark h-full font-sans antialiased ${geistSans.variable} ${geistMono.variable} ${inter.variable}`}
     >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>

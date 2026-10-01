@@ -29,13 +29,6 @@ repos:
     hooks:
       - id: actionlint
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.9
-    hooks:
-      - id: ruff-check
-        args: [--fix]
-      - id: ruff-format
-
   - repo: local
     hooks:
       - id: oxfmt
@@ -59,10 +52,4 @@ repos:
         entry: pnpm install --lockfile-only --frozen-lockfile
         language: system
         files: ^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$
-        pass_filenames: false
-      - id: uv-lockfile
-        name: uv lockfile is up to date
-        entry: uv lock --check --project scripts
-        language: system
-        files: ^scripts/(pyproject\.toml|uv\.lock)$
         pass_filenames: false

@@ -30,10 +30,3 @@ updates:
     groups:
       pre-commit-hooks:
         patterns: ["*"]
-
-  - package-ecosystem: uv
-    directory: /scripts
-    schedule:
-      interval: monthly
-    cooldown:
-      default-days: 7
