@@ -13,5 +13,5 @@
     "react/no-children-prop": "off",
     "no-unused-vars": "warn"
   },
-  "ignorePatterns": [".next/**", "out/**", "build/**", "next-env.d.ts"]
+  "ignorePatterns": [".next/**", "out/**", "build/**", "next-env.d.ts", "generated/**"]
 }

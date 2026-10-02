@@ -5,6 +5,7 @@
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "generated/**",
     "pnpm-lock.yaml",
     "public/**",
     "assets/**"
@@ -17,7 +18,13 @@
       { "groupName": "components", "elementNamePattern": ["@/components/**"] },
       {
         "groupName": "lib",
-        "elementNamePattern": ["@prisma/client", "@/types/**", "@/core/**", "@/lib/**"]
+        "elementNamePattern": [
+          "@prisma/**",
+          "@/generated/**",
+          "@/types/**",
+          "@/core/**",
+          "@/lib/**"
+        ]
       },
       { "groupName": "hooks", "elementNamePattern": ["@/hooks/**", "@/contexts/**", "@/stores/**"] }
     ],

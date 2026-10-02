@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Locale {
+  en
+  fr
+  de
+  it
+}
+
+enum ToolCategory {
+  app
+  stack
+}
+
+model Project {
+  id           Int                  @id @default(autoincrement())
+  slug         String               @unique @db.VarChar(64)
+  name         String               @db.VarChar(64)
+  year         Int                  @db.SmallInt
+  url          String?              @db.VarChar(255)
+  position     Int                  @default(0)
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
+  translations ProjectTranslation[]
+
+  @@map("projects")
+}
+
+model ProjectTranslation {
+  projectId   Int     @map("project_id")
+  locale      Locale
+  kind        String? @db.VarChar(64)
+  description String  @db.VarChar(255)
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, locale])
+  @@map("project_translations")
+}
+
+model Interest {
+  id           Int                   @id @default(autoincrement())
+  slug         String                @unique @db.VarChar(64)
+  glyph        String                @db.Char(1)
+  position     Int                   @default(0)
+  createdAt    DateTime              @default(now()) @map("created_at")
+  updatedAt    DateTime              @updatedAt @map("updated_at")
+  translations InterestTranslation[]
+
+  @@map("interests")
+}
+
+model InterestTranslation {
+  interestId Int      @map("interest_id")
+  locale     Locale
+  name       String   @db.VarChar(64)
+  text       String   @db.VarChar(255)
+  interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([interestId, locale])
+  @@map("interest_translations")
+}
+
+model Link {
+  id        Int      @id @default(autoincrement())
+  label     String   @unique @db.VarChar(64)
+  url       String   @db.VarChar(255)
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("links")
+}
+
+model Tool {
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(64)
+  category  ToolCategory
+  position  Int          @default(0)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  @@unique([category, name])
+  @@map("tools")
+}
+
+model BlogPost {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique @db.VarChar(128)
+  locale      Locale    @default(en)
+  title       String    @db.VarChar(128)
+  excerpt     String    @db.VarChar(255)
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([publishedAt])
+  @@map("blog_posts")
+}
+
+model Switch {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(64)
+  spec      String    @db.VarChar(128)
+  ports     Int       @db.SmallInt
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  machines  Machine[]
+
+  @@map("switches")
+}
+
+model Machine {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(64)
+  spec      String   @db.VarChar(128)
+  switchId  Int      @map("switch_id")
+  port      Int      @db.SmallInt
+  speed     Int
+  monitorId Int?     @map("monitor_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  switch    Switch   @relation(fields: [switchId], references: [id], onDelete: Cascade)
+
+  @@unique([switchId, port])
+  @@map("machines")
+}
