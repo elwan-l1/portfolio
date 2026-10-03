@@ -1,4 +1,5 @@
 import "../globals.css";
+import { ConsoleLogo } from "@/components/console-logo";
 import { Trail } from "@/components/trail";
 
 import { art, martian } from "../fonts";
@@ -46,6 +47,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
     <html lang={lang} className={`${martian.variable} ${art.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Trail />
+        <ConsoleLogo />
         {children}
       </body>
     </html>
