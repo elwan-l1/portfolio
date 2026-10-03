@@ -1,5 +1,5 @@
 import { Dictionary } from "@/app/[lang]/dictionaries";
+import { en } from "@/dictionaries/en";
 
-export const fr: Dictionary = {
-  hello: "Hello",
-};
+// not translated yet
+export const fr: Dictionary = en;

@@ -5,7 +5,18 @@ import { fr } from "@/dictionaries/fr";
 import { it } from "@/dictionaries/it";
 
 export type Dictionary = {
-  hello: string;
+  role: string;
+  affiliation: string;
+  bio: string[];
+  fig: string;
+  skeleton: string;
+  eye: string;
+  uses: string;
+  blog: string;
+  latestPost: string;
+  contact: string;
+  interests: string;
+  projects: string;
 };
 
 const dictionaries = {
