@@ -41,3 +41,20 @@ li {
 ::selection {
   @apply bg-pink text-crust;
 }
+
+.ascii-layer {
+  font-family: var(--font-art), monospace;
+  line-height: 1;
+}
+
+.ascii-layer span {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+[data-letter] {
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
+}

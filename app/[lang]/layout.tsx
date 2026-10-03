@@ -1,4 +1,6 @@
 import "../globals.css";
+import { Trail } from "@/components/trail";
+
 import { art, martian } from "../fonts";
 import { LANGUAGES } from "@/constants/global";
 import type { Metadata, Viewport } from "next";
@@ -42,7 +44,10 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
 
   return (
     <html lang={lang} className={`${martian.variable} ${art.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <Trail />
+        {children}
+      </body>
     </html>
   );
 }

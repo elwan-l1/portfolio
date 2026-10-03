@@ -1,5 +1,6 @@
 import { Fig, Tile } from "@/components/tile";
 import { Title } from "@/components/title";
+import { Letters } from "@/components/trail";
 import { Uses } from "@/components/uses";
 
 import type { HomeContent } from "@/lib/content";
@@ -134,9 +135,10 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
         </ul>
         <pre
           aria-label="L1"
+          data-glitch
           className="text-crust tall:block m-0 hidden self-start text-[5px] leading-none"
         >
-          {LOGO}
+          <Letters text={LOGO} />
         </pre>
       </Tile>
 
