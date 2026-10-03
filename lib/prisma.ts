@@ -5,9 +5,8 @@ import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 const createClient = () =>
   new PrismaClient({ adapter: new PrismaMariaDb(process.env.DATABASE_URL!) });
 
-// One client across hot reloads in development, instead of a new pool per reload.
+// on globalThis so dev hot reloads reuse one pool
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma = globalForPrisma.prisma ?? createClient();
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// created on first query, not at import: `next build` imports pages without a database
+export const getPrisma = () => (globalForPrisma.prisma ??= createClient());

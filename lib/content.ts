@@ -1,6 +1,6 @@
 import "server-only";
 import type { Locale } from "@/generated/prisma/client";
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 
 const FALLBACK: Locale = "en";
 
@@ -8,6 +8,7 @@ const pick = <T extends { locale: Locale }>(translations: T[], locale: Locale) =
   translations.find((t) => t.locale === locale) ?? translations.find((t) => t.locale === FALLBACK);
 
 export const getHomeContent = async (locale: Locale) => {
+  const prisma = getPrisma();
   const translations = { where: { locale: { in: [locale, FALLBACK] } } };
 
   const [projects, interests, links, tools, latestPost] = await Promise.all([
