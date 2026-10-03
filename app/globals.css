@@ -58,3 +58,37 @@ li {
   width: 1ch;
   text-align: center;
 }
+
+pre[role="img"] ::selection {
+  background: color-mix(in srgb, var(--color-pink) 40%, transparent);
+  color: #fff;
+}
+
+.ambient {
+  --ink: currentColor;
+}
+
+.ambient [data-letter] {
+  color: color-mix(in srgb, var(--ink), var(--color-crust) var(--shade, 0%));
+}
+
+/* six breaths a minute: in for 4s, out for 6s */
+.breathe {
+  animation: breathe 10s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breathe {
+    animation: none;
+  }
+}

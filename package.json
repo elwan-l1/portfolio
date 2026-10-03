@@ -16,7 +16,8 @@
     "db:up": "docker compose up -d --wait",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "art": "tsx scripts/encode-art.ts"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.9",

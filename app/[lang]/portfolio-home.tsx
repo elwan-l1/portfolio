@@ -1,3 +1,6 @@
+import { Field } from "@/components/field";
+import { FitText } from "@/components/fit-text";
+import { Penalty } from "@/components/penalty";
 import { Fig, Tile } from "@/components/tile";
 import { Title } from "@/components/title";
 import { Letters } from "@/components/trail";
@@ -6,6 +9,8 @@ import { Uses } from "@/components/uses";
 import type { HomeContent } from "@/lib/content";
 
 import type { Dictionary, Locale } from "./dictionaries";
+import skeleton from "@/assets/art/binary-skeleton-sharp-card";
+import eye from "@/assets/art/eye-study";
 import { EMAIL, NAME } from "@/constants/global";
 import { LOGO } from "@/constants/logo";
 
@@ -14,8 +19,6 @@ type PortfolioHomeProps = {
   dictionary: Dictionary;
   content: HomeContent;
 };
-
-const ArtPlaceholder = () => <div aria-hidden className="min-h-40 flex-1" />;
 
 const ROW =
   "grid w-full grid-cols-[4ch_minmax(0,1fr)] content-center gap-x-3 gap-y-0.5 py-2 text-subtext0 lg:grid-cols-[16ch_minmax(0,1fr)] lg:items-baseline lg:py-1 xl:grid-cols-[4ch_16ch_minmax(0,1fr)]";
@@ -28,7 +31,10 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
       {/* who */}
       <Tile className="bg-mantle tall:gap-5 flex flex-col justify-between gap-3 lg:col-span-4 lg:row-span-2">
         <div>
-          <h1 className="text-head text-text m-0 font-bold">{NAME}</h1>
+          <h1 className="text-text m-0 w-[62%] font-bold">
+            {/* martian mono bold side bearings on E and n, less the tracking after the n */}
+            <FitText lines={[NAME]} bearings={[0.108, 0.035]} />
+          </h1>
           <p className="text-lead text-text m-0 mt-4 leading-tight font-bold tracking-[-0.02em]">
             {t.role}
           </p>
@@ -41,6 +47,7 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
             </p>
           ))}
         </div>
+        <Penalty />
       </Tile>
 
       {/* the skeleton */}
@@ -55,7 +62,7 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
         >
           {t.skeleton}
         </Fig>
-        <ArtPlaceholder />
+        <Field art={skeleton} align="bottom" reserve={48} label={t.skeletonLabel} />
       </Tile>
 
       {/* tools */}
@@ -144,7 +151,7 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
 
       {/* the eye */}
       <Tile as="figure" className="bg-crust flex flex-col gap-3 overflow-hidden lg:col-span-3">
-        <ArtPlaceholder />
+        <Field art={eye} air={4} label={t.eyeLabel} />
         <Fig n={2} label={t.fig}>
           {t.eye}
         </Fig>

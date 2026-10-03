@@ -10,7 +10,9 @@ export type Dictionary = {
   bio: string[];
   fig: string;
   skeleton: string;
+  skeletonLabel: string;
   eye: string;
+  eyeLabel: string;
   uses: string;
   blog: string;
   latestPost: string;
