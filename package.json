@@ -3,9 +3,9 @@
   "version": "4.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 2828",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 2828",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
