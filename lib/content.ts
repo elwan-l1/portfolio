@@ -11,7 +11,7 @@ export const getHomeContent = async (locale: Locale) => {
   const prisma = getPrisma();
   const translations = { where: { locale: { in: [locale, FALLBACK] } } };
 
-  const [projects, interests, links, tools, latestPost] = await Promise.all([
+  const [projects, interests, links, tools, latestPost, homelab] = await Promise.all([
     prisma.project.findMany({ orderBy: { position: "asc" }, include: { translations } }),
     prisma.interest.findMany({ orderBy: { position: "asc" }, include: { translations } }),
     prisma.link.findMany({ orderBy: { position: "asc" } }),
@@ -20,6 +20,7 @@ export const getHomeContent = async (locale: Locale) => {
       where: { publishedAt: { not: null } },
       orderBy: { publishedAt: "desc" },
     }),
+    prisma.switch.findFirst({ include: { machines: { orderBy: { port: "asc" } } } }),
   ]);
 
   return {
@@ -37,6 +38,7 @@ export const getHomeContent = async (locale: Locale) => {
     apps: tools.filter((tool) => tool.category === "app").map((tool) => tool.name),
     stack: tools.filter((tool) => tool.category === "stack").map((tool) => tool.name),
     latestPost,
+    homelab,
   };
 };
 

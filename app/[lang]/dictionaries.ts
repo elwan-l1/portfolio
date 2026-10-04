@@ -18,6 +18,7 @@ export type Dictionary = {
   latestPost: string;
   contact: string;
   interests: string;
+  interestsBack: string;
   projects: string;
 };
 

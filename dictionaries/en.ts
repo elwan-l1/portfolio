@@ -17,5 +17,6 @@ export const en: Dictionary = {
   latestPost: "latest post",
   contact: "Contact",
   interests: "Interests",
+  interestsBack: "interests",
   projects: "Projects",
 };

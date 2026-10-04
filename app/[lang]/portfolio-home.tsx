@@ -1,5 +1,6 @@
 import { Field } from "@/components/field";
 import { FitText } from "@/components/fit-text";
+import { Interests } from "@/components/interests";
 import { Penalty } from "@/components/penalty";
 import { Fig, Tile } from "@/components/tile";
 import { Title } from "@/components/title";
@@ -159,24 +160,12 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
 
       {/* interests */}
       <Tile edge="pink" className="bg-pink text-crust flex flex-col overflow-hidden lg:col-span-3">
-        <div className="flex flex-1 flex-col justify-between gap-4">
-          <Title on="pink" glyph="※">
-            {t.interests}
-          </Title>
-          <ul className="text-body m-0 flex list-none flex-col gap-1 p-0 leading-snug">
-            {content.interests.map((interest) => (
-              <li key={interest.slug} className="flex items-baseline gap-2.5 py-0.5">
-                <span
-                  aria-hidden
-                  className="bg-crust text-pink inline-block w-[2.2ch] shrink-0 text-center font-bold"
-                >
-                  {interest.glyph}
-                </span>
-                {interest.name}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Interests
+          interests={content.interests}
+          lab={content.homelab}
+          title={t.interests}
+          back={t.interestsBack}
+        />
       </Tile>
 
       {/* projects */}
