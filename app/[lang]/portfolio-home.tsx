@@ -1,6 +1,7 @@
 import { Field } from "@/components/field";
 import { FitText } from "@/components/fit-text";
 import { Interests } from "@/components/interests";
+import { LanguageSwitch } from "@/components/language-switch";
 import { Penalty } from "@/components/penalty";
 import { Fig, Tile } from "@/components/tile";
 import { Title } from "@/components/title";
@@ -31,6 +32,9 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
     <main className="bg-base tall:lg:grid-rows-[minmax(min-content,0.8fr)_minmax(min-content,0.34fr)_minmax(min-content,1fr)] mx-auto grid w-full max-w-[1680px] grid-cols-1 gap-[3px] p-2 lg:h-dvh lg:grid-cols-12 lg:grid-rows-[minmax(min-content,0.5fr)_minmax(min-content,0.5fr)_minmax(min-content,1fr)]">
       {/* who */}
       <Tile className="bg-mantle tall:gap-5 flex flex-col justify-between gap-3 lg:col-span-4 lg:row-span-2">
+        <div className="tall:top-6 tall:right-6 absolute top-5 right-5">
+          <LanguageSwitch lang={lang} />
+        </div>
         <div>
           <h1 className="text-text m-0 w-[62%] font-bold">
             {/* martian mono bold side bearings on E and n, less the tracking after the n */}
