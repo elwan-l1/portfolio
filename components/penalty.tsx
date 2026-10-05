@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 
 import { byHand, lambda, playIntro, RESTING, stopIntro, useLambda, usePrint } from "@/lib/lambda";

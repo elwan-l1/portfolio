@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio
 
-## Getting Started
+One page, four languages, content from MySQL. [TanStack Start](https://tanstack.com/start) on
+Vite and Nitro.
 
-First, run the development server:
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+pnpm db:up
+pnpm db:migrate
+pnpm db:seed
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Production: `pnpm build`, then `pnpm start`. Both listen on port 2828.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Why TanStack Start instead of Next.js
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The site started on Next.js 16 (App Router). It moved to TanStack Start in October 2026 to
+get a smaller bundle and a simpler stack. Both versions render the same page from the same DB.
 
-## Learn More
+### Measured difference
 
-To learn more about Next.js, take a look at the following resources:
+Same machine (Apple M5 Pro, 18 cores, Node 26), production build, page `/en`, medians of 5
+Lighthouse runs, builds averaged over 3 clean runs, load test 10 connections for 10 s with
+autocannon. Machine load was 2.6 for Next.js and 3.3 for TanStack Start.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Metric                        | Next.js 16 | TanStack Start | Change |
+| ----------------------------- | ---------- | -------------- | ------ |
+| JS over the wire              | 171 KB     | 120 KB         | -30%   |
+| HTML document                 | 18 KB      | 6.3 KB         | -65%   |
+| Total transfer                | 227 KB     | 162 KB         | -29%   |
+| Client JS on disk (gzip)      | 207 KB     | 155 KB         | -25%   |
+| Clean build                   | 2536 ms    | 1445 ms        | -43%   |
+| Dev cold start                | 1957 ms    | 1468 ms        | -25%   |
+| Dev warm request              | 53 ms      | 14 ms          | -74%   |
+| Dev server memory             | 1238 MB    | 765 MB         | -38%   |
+| Production server memory      | 639 MB     | 554 MB         | -13%   |
+| TTFB median                   | 6.8 ms     | 4.1 ms         | -41%   |
+| Load throughput               | 308 req/s  | 1234 req/s     | 4x     |
+| Load latency p99              | 42 ms      | 17 ms          | -60%   |
+| Mobile LCP                    | 2508 ms    | 2165 ms        | -14%   |
+| Mobile TBT                    | 58 ms      | 24 ms          | -59%   |
+| Mobile first contentful paint | 1054 ms    | 1803 ms        | +71%   |
+| Lighthouse score, mobile      | 77         | 77             | same   |
+| Lighthouse score, desktop     | 100        | 100            | same   |

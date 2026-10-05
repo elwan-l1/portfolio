@@ -3,8 +3,8 @@ import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { art, martian } from "@/app/fonts";
 import { clearCache, measureNaturalWidth, prepareWithSegments } from "@chenglou/pretext";
 
-const FAMILY = martian.style.fontFamily;
-const ART_FAMILY = art.style.fontFamily;
+const FAMILY = martian.family;
+const ART_FAMILY = art.family;
 const WEIGHTS = [400, 700];
 
 /** Canvas font shorthand, the format pretext measures with. */

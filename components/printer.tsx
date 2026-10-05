@@ -1,5 +1,3 @@
-"use client";
-
 import { memo, useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { byHand, print } from "@/lib/lambda";

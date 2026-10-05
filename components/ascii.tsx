@@ -1,5 +1,3 @@
-"use client";
-
 import { Fragment, useRef, type CSSProperties } from "react";
 
 import { Letters } from "@/components/trail";

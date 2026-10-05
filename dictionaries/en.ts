@@ -1,4 +1,4 @@
-import { Dictionary } from "@/app/[lang]/dictionaries";
+import type { Dictionary } from "./type";
 
 export const en: Dictionary = {
   role: "Data engineer",

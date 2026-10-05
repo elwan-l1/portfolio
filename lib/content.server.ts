@@ -1,13 +1,12 @@
-import "server-only";
 import type { Locale } from "@/generated/prisma/client";
-import { getPrisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma.server";
 
 const FALLBACK: Locale = "en";
 
 const pick = <T extends { locale: Locale }>(translations: T[], locale: Locale) =>
   translations.find((t) => t.locale === locale) ?? translations.find((t) => t.locale === FALLBACK);
 
-export const getHomeContent = async (locale: Locale) => {
+const loadHomeContent = async (locale: Locale) => {
   const prisma = getPrisma();
   const translations = { where: { locale: { in: [locale, FALLBACK] } } };
 
@@ -42,4 +41,18 @@ export const getHomeContent = async (locale: Locale) => {
   };
 };
 
-export type HomeContent = Awaited<ReturnType<typeof getHomeContent>>;
+export type HomeContent = Awaited<ReturnType<typeof loadHomeContent>>;
+
+const TTL = 60_000;
+const cache = new Map<Locale, { at: number; content: Promise<HomeContent> }>();
+
+// the DB is read at most once a minute per locale, concurrent requests share the read
+export const getHomeContent = (locale: Locale) => {
+  const hit = cache.get(locale);
+  if (hit && Date.now() - hit.at < TTL) return hit.content;
+
+  const content = loadHomeContent(locale);
+  cache.set(locale, { at: Date.now(), content });
+  content.catch(() => cache.delete(locale));
+  return content;
+};

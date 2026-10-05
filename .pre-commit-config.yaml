@@ -43,7 +43,7 @@ repos:
         types_or: [javascript, jsx, ts, tsx]
       - id: tsc
         name: tsc (typecheck)
-        entry: sh -c 'node_modules/.bin/next typegen && node_modules/.bin/tsc --noEmit'
+        entry: node_modules/.bin/tsc --noEmit
         language: system
         types_or: [ts, tsx]
         pass_filenames: false

@@ -1,19 +1,25 @@
-"use client";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 
-import { useEffect, useRef, useState } from "react";
-
-import { Fpv } from "@/components/fpv/fpv";
-import { Homelab } from "@/components/homelab";
-import { Logos } from "@/components/logos";
-import { Printer } from "@/components/printer";
-import { Shader } from "@/components/shader";
 import { Title } from "@/components/title";
 import { CHARS } from "@/components/trail";
 
-import type { HomeContent } from "@/lib/content";
+import type { HomeContent } from "@/lib/content.server";
 import { useBox } from "@/lib/type";
 
 type Interest = HomeContent["interests"][number];
+
+// each panel loads on first open, so none of them weigh on the first paint
+const Fpv = lazy(() => import("@/components/fpv/fpv").then(({ Fpv }) => ({ default: Fpv })));
+const Homelab = lazy(() =>
+  import("@/components/homelab").then(({ Homelab }) => ({ default: Homelab })),
+);
+const Logos = lazy(() => import("@/components/logos").then(({ Logos }) => ({ default: Logos })));
+const Printer = lazy(() =>
+  import("@/components/printer").then(({ Printer }) => ({ default: Printer })),
+);
+const Shader = lazy(() =>
+  import("@/components/shader").then(({ Shader }) => ({ default: Shader })),
+);
 
 const SIZE = 11; // px
 const COVER = 260; // ms for the glyphs to cover the card
@@ -148,7 +154,9 @@ export const Interests = ({ interests, lab, title, back }: InterestsProps) => {
           <Title on="pink" glyph={open.glyph}>
             {open.name}
           </Title>
-          <Panel interest={open} lab={lab} />
+          <Suspense>
+            <Panel interest={open} lab={lab} />
+          </Suspense>
           <button
             ref={backButton}
             type="button"

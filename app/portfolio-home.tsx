@@ -8,13 +8,13 @@ import { Title } from "@/components/title";
 import { Letters } from "@/components/trail";
 import { Uses } from "@/components/uses";
 
-import type { HomeContent } from "@/lib/content";
+import type { HomeContent } from "@/lib/content.server";
 
-import type { Dictionary, Locale } from "./dictionaries";
 import skeleton from "@/assets/art/binary-skeleton-sharp-card";
 import eye from "@/assets/art/eye-study";
-import { EMAIL, NAME } from "@/constants/global";
+import { EMAIL, NAME, type Locale } from "@/constants/global";
 import { LOGO } from "@/constants/logo";
+import type { Dictionary } from "@/dictionaries/type";
 
 type PortfolioHomeProps = {
   lang: Locale;

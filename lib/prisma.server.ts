@@ -1,4 +1,3 @@
-import "server-only";
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
@@ -10,3 +9,6 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 // created on first query, not at import: `next build` imports pages without a database
 export const getPrisma = () => (globalForPrisma.prisma ??= createClient());
+
+// without this the open pool keeps the process alive after SIGTERM
+export const disconnectPrisma = () => globalForPrisma.prisma?.$disconnect();

@@ -1,10 +1,11 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "ignorePatterns": [
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
+    ".output/**",
+    ".nitro/**",
+    ".tanstack/**",
+    "dist/**",
+    "app/routeTree.gen.ts",
     "generated/**",
     "pnpm-lock.yaml",
     "public/**",

@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 
 import { artAdvance, useBox, useFonts } from "@/lib/type";

@@ -1,10 +1,8 @@
-"use client";
-
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CHARS } from "@/components/trail";
 
-import type { HomeContent } from "@/lib/content";
+import type { HomeContent } from "@/lib/content.server";
 import { BEATS, type Status } from "@/lib/status";
 
 const TICK = 90; // ms per animation step
