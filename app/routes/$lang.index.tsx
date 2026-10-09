@@ -1,11 +1,29 @@
 import { getHome } from "@/lib/home";
 
 import PortfolioHome from "../portfolio-home";
-import type { Locale } from "@/constants/global";
+import { LANGUAGES, ORIGIN, type Locale } from "@/constants/global";
 import { createFileRoute } from "@tanstack/react-router";
+
+const DESCRIPTION =
+  "Hey, I'm Elwan, a data engineer who really likes exploring. I get where I'm going, just rarely by the main road.";
 
 export const Route = createFileRoute("/$lang/")({
   loader: ({ params }) => getHome({ data: params.lang as Locale }),
+  head: ({ params }) => ({
+    meta: [
+      { title: "Elwan" },
+      { name: "description", content: DESCRIPTION },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${ORIGIN}/${params.lang}` },
+      { property: "og:title", content: "Elwan" },
+      { property: "og:description", content: DESCRIPTION },
+    ],
+    links: [
+      { rel: "canonical", href: `${ORIGIN}/${params.lang}` },
+      ...LANGUAGES.map((l) => ({ rel: "alternate", hrefLang: l, href: `${ORIGIN}/${l}` })),
+      { rel: "alternate", hrefLang: "x-default", href: `${ORIGIN}/` },
+    ],
+  }),
   component: Home,
 });
 

@@ -1,0 +1,285 @@
+.post {
+  font-family: var(--font-text);
+  /* monospace is about a third wider than proportional text: 15px reads like 18-20px, ~75 characters a line */
+  font-size: clamp(0.875rem, 0.8rem + 0.2vw, 0.9375rem);
+  line-height: 1.7;
+  color: var(--color-subtext1);
+  overflow-wrap: break-word;
+}
+
+.post > :first-child {
+  margin-top: 0;
+}
+
+.post p,
+.post ul,
+.post ol,
+.post blockquote,
+.post pre,
+.post table {
+  margin: 0 0 1.25em;
+}
+
+.post h2,
+.post h3,
+.post h4 {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  scroll-margin-top: 1.5rem;
+}
+
+.post h2 {
+  margin: 2.4em 0 0.8em;
+  font-size: 1.3em;
+}
+
+.post h3 {
+  margin: 2em 0 0.6em;
+  font-size: 1.1em;
+}
+
+.post h4 {
+  margin: 1.6em 0 0.5em;
+  font-size: 1em;
+}
+
+.post h2::before,
+.post h3::before,
+.post h4::before {
+  margin-right: 0.6em;
+  font-weight: 400;
+  color: var(--color-overlay0);
+}
+
+.post h2::before {
+  content: "##";
+}
+
+.post h3::before {
+  content: "###";
+}
+
+.post h4::before {
+  content: "####";
+}
+
+.post strong {
+  color: var(--color-text);
+}
+
+.post del {
+  color: var(--color-overlay1);
+}
+
+.post a {
+  color: var(--color-text);
+  text-decoration: underline;
+  text-decoration-color: var(--color-pink);
+  text-underline-offset: 4px;
+}
+
+.post a:hover {
+  color: var(--color-pink);
+}
+
+.post :not(pre) > code {
+  padding: 0.1em 0.4em;
+  font-size: 0.9em;
+  color: var(--color-peach);
+  background: var(--color-surface0);
+}
+
+.post ul,
+.post ol {
+  padding-left: 1.6em;
+}
+
+.post ul {
+  list-style: "– ";
+}
+
+.post ol {
+  list-style: decimal;
+}
+
+.post li::marker {
+  color: var(--color-overlay1);
+}
+
+.post li > ul,
+.post li > ol {
+  margin: 0;
+}
+
+.post li:has(> input[type="checkbox"]) {
+  margin-left: -1.6em;
+  list-style: none;
+}
+
+.post input[type="checkbox"] {
+  margin-right: 1ch;
+  accent-color: var(--color-mauve);
+}
+
+.post img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.post blockquote {
+  padding-left: 1.25em;
+  color: var(--color-subtext0);
+  border-left: 2px solid var(--color-mauve);
+}
+
+.post blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.post hr {
+  margin: 2.5em 0;
+  border: 0;
+  border-top: 1px solid var(--color-surface0);
+}
+
+.post pre {
+  position: relative;
+  padding: 2.1em 1.25em 1.1em;
+  overflow-x: auto;
+  font-size: 0.875em;
+  line-height: 1.65;
+  color: var(--color-text);
+  background: var(--color-crust);
+  border: 1px solid var(--color-surface0);
+}
+
+.post pre::before {
+  position: absolute;
+  top: 0.55em;
+  right: 1em;
+  font-size: 0.8em;
+  color: var(--color-overlay0);
+  content: attr(data-lang);
+}
+
+.post pre code {
+  font-family: var(--font-mono);
+  white-space: pre;
+  font-variant-ligatures: none;
+}
+
+.post .th-keyword {
+  color: var(--color-mauve);
+}
+
+.post .th-string {
+  color: var(--color-green);
+}
+
+.post .th-number,
+.post .th-literal {
+  color: var(--color-peach);
+}
+
+.post .th-comment {
+  color: var(--color-overlay0);
+}
+
+.post .th-function,
+.post .th-command {
+  color: var(--color-blue);
+}
+
+.post .th-type,
+.post .th-attr {
+  color: var(--color-yellow);
+}
+
+.post .th-property,
+.post .th-variable {
+  color: var(--color-lavender);
+}
+
+.post .th-operator {
+  color: var(--color-sky);
+}
+
+.post .th-tag,
+.post .th-deleted {
+  color: var(--color-red);
+}
+
+.post .th-selector,
+.post .th-meta {
+  color: var(--color-pink);
+}
+
+.post .th-inserted {
+  color: var(--color-green);
+}
+
+.post .th-heading {
+  font-weight: 700;
+  color: var(--color-blue);
+}
+
+.post .th-link {
+  color: var(--color-sapphire);
+}
+
+.post table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  font-size: 0.9em;
+  border-collapse: collapse;
+}
+
+.post th,
+.post td {
+  padding: 0.55em 1.25em 0.55em 0;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--color-surface0);
+}
+
+.post th {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--color-overlay2);
+}
+
+.post sup a {
+  font-size: 0.8em;
+  color: var(--color-pink);
+  text-decoration: none;
+}
+
+.post .footnotes {
+  margin-top: 3em;
+  padding-top: 1em;
+  font-size: 0.875em;
+  color: var(--color-subtext0);
+  border-top: 1px solid var(--color-surface0);
+}
+
+.post .footnotes ol {
+  margin: 0;
+}
+
+.post .footnotes p {
+  margin: 0 0 0.5em;
+}
+
+.post .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

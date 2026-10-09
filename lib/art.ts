@@ -15,6 +15,9 @@ export type Art = {
   plain: string[];
 };
 
+/** Glyphs of the generated post art, lightest to densest. */
+export const RAMP = ["▒", "%", "$", "#", "M", "W", "@", "▓", "█"];
+
 export const GLYPHS: Record<string, string> = { a: "▒", b: "▓", c: "█", d: "&" };
 
 export const decode = (encoded: string): Art => {
@@ -49,4 +52,44 @@ export const decode = (encoded: string): Art => {
   }
 
   return { id, cols: Number(cols), rows: Number(count), colors, lines, plain };
+};
+
+export type Source = {
+  id: string;
+  cols: number;
+  rows: number;
+  variants: { colors: string[]; lines: [number, string][][] }[];
+};
+
+const SHORT = Object.fromEntries(Object.entries(GLYPHS).map(([short, glyph]) => [glyph, short]));
+const ALLOWED = new Set([" ", "@", "#", "M", "W", "$", "%", ...Object.values(GLYPHS)]);
+
+export const encode = (source: Source) => {
+  const { colors, lines } = source.variants[0];
+  const cells = lines.map((runs) =>
+    runs.flatMap(([color, text]) => [...text].map((ch) => ({ ch, color }))),
+  );
+
+  const inks: [number, number][] = [];
+  for (const { ch, color } of cells.flat()) {
+    if (!ALLOWED.has(ch)) throw new Error(`${source.id}: glyph "${ch}" has no place in the format`);
+    if (ch === " ") continue;
+    const last = inks.at(-1);
+    if (last && last[0] === color) last[1]++;
+    else inks.push([color, 1]);
+  }
+
+  const rows = cells.map((row) =>
+    row
+      .map(({ ch }) => SHORT[ch] ?? ch)
+      .join("")
+      .trimEnd()
+      .replace(/ {2,}/g, (spaces) => String(spaces.length)),
+  );
+
+  return [
+    [source.id, source.cols, source.rows, ...colors].join(" "),
+    inks.map(([color, n]) => `${color}${n}`).join(","),
+    ...rows,
+  ].join("\n");
 };

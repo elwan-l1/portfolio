@@ -1,6 +1,8 @@
 import type { Locale } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/prisma.server";
 
+import { getLatestPost } from "./blog.server";
+
 const FALLBACK: Locale = "en";
 
 const pick = <T extends { locale: Locale }>(translations: T[], locale: Locale) =>
@@ -15,10 +17,7 @@ const loadHomeContent = async (locale: Locale) => {
     prisma.interest.findMany({ orderBy: { position: "asc" }, include: { translations } }),
     prisma.link.findMany({ orderBy: { position: "asc" } }),
     prisma.tool.findMany({ orderBy: { position: "asc" } }),
-    prisma.blogPost.findFirst({
-      where: { publishedAt: { not: null } },
-      orderBy: { publishedAt: "desc" },
-    }),
+    getLatestPost(),
     prisma.switch.findFirst({ include: { machines: { orderBy: { port: "asc" } } } }),
   ]);
 

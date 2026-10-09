@@ -1,47 +1,7 @@
-import { decode, GLYPHS } from "../lib/art";
+import { decode, encode, type Source } from "../lib/art";
 // usage: pnpm art <generator-output.json>...
 // writes assets/art/<id>.ts in the compact format of lib/art.ts, and checks it decodes back exactly
 import { readFileSync, writeFileSync } from "node:fs";
-
-type Source = {
-  id: string;
-  cols: number;
-  rows: number;
-  variants: { colors: string[]; lines: [number, string][][] }[];
-};
-
-const SHORT = Object.fromEntries(Object.entries(GLYPHS).map(([short, glyph]) => [glyph, short]));
-const ALLOWED = new Set([" ", "@", "#", "M", "W", "$", "%", ...Object.values(GLYPHS)]);
-
-const encode = (source: Source) => {
-  const { colors, lines } = source.variants[0];
-  const cells = lines.map((runs) =>
-    runs.flatMap(([color, text]) => [...text].map((ch) => ({ ch, color }))),
-  );
-
-  const inks: [number, number][] = [];
-  for (const { ch, color } of cells.flat()) {
-    if (!ALLOWED.has(ch)) throw new Error(`${source.id}: glyph "${ch}" has no place in the format`);
-    if (ch === " ") continue;
-    const last = inks.at(-1);
-    if (last && last[0] === color) last[1]++;
-    else inks.push([color, 1]);
-  }
-
-  const rows = cells.map((row) =>
-    row
-      .map(({ ch }) => SHORT[ch] ?? ch)
-      .join("")
-      .trimEnd()
-      .replace(/ {2,}/g, (spaces) => String(spaces.length)),
-  );
-
-  return [
-    [source.id, source.cols, source.rows, ...colors].join(" "),
-    inks.map(([color, n]) => `${color}${n}`).join(","),
-    ...rows,
-  ].join("\n");
-};
 
 const check = (source: Source, encoded: string) => {
   const art = decode(encoded);

@@ -91,17 +91,42 @@ model Tool {
 }
 
 model BlogPost {
-  id          Int       @id @default(autoincrement())
-  slug        String    @unique @db.VarChar(128)
-  locale      Locale    @default(en)
-  title       String    @db.VarChar(128)
-  excerpt     String    @db.VarChar(255)
-  publishedAt DateTime? @map("published_at")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id          Int              @id @default(autoincrement())
+  slug        String           @unique @db.VarChar(128)
+  title       String           @db.VarChar(128)
+  excerpt     String           @db.VarChar(255)
+  body        String           @db.MediumText
+  art         String?          @db.Text
+  publishedAt DateTime?        @map("published_at")
+  views       Int              @default(0)
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  sources     BlogPostSource[]
+  tags        BlogPostTag[]
 
   @@index([publishedAt])
+  @@index([views])
   @@map("blog_posts")
+}
+
+model BlogPostSource {
+  postId Int      @map("post_id")
+  source String   @db.VarChar(32)
+  views  Int      @default(0)
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([postId, source])
+  @@map("blog_post_sources")
+}
+
+model BlogPostTag {
+  postId Int      @map("post_id")
+  tag    String   @db.VarChar(32)
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tag])
+  @@index([tag])
+  @@map("blog_post_tags")
 }
 
 model Switch {

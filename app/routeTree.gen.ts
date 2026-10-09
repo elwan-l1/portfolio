@@ -10,12 +10,41 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LangRouteImport } from './routes/$lang'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as BlogDotpngRouteImport } from './routes/blog[.]png'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as ApiStatusRouteImport } from './routes/api/status'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as BlogRssDotxmlRouteImport } from './routes/blog.rss[.]xml'
+import { Route as BlogChar123slugChar125DotmdRouteImport } from './routes/blog.{$slug}[.]md'
+import { Route as BlogChar123slugChar125DotpngRouteImport } from './routes/blog.{$slug}[.]png'
 
 const LangRoute = LangRouteImport.update({
   id: '/$lang',
   path: '/$lang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogDotpngRoute = BlogDotpngRouteImport.update({
+  id: '/blog.png',
+  path: '/blog.png',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LangIndexRoute = LangIndexRouteImport.update({
@@ -28,32 +57,124 @@ const ApiStatusRoute = ApiStatusRouteImport.update({
   path: '/api/status',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
+} as any)
+const BlogRssDotxmlRoute = BlogRssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
+  getParentRoute: () => BlogRoute,
+} as any)
+const BlogChar123slugChar125DotmdRoute =
+  BlogChar123slugChar125DotmdRouteImport.update({
+    id: '/{$slug}.md',
+    path: '/{$slug}.md',
+    getParentRoute: () => BlogRoute,
+  } as any)
+const BlogChar123slugChar125DotpngRoute =
+  BlogChar123slugChar125DotpngRouteImport.update({
+    id: '/{$slug}.png',
+    path: '/{$slug}.png',
+    getParentRoute: () => BlogRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/$lang': typeof LangRouteWithChildren
+  '/blog': typeof BlogRouteWithChildren
+  '/blog.png': typeof BlogDotpngRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/status': typeof ApiStatusRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/{$slug}.md': typeof BlogChar123slugChar125DotmdRoute
+  '/blog/{$slug}.png': typeof BlogChar123slugChar125DotpngRoute
   '/$lang/': typeof LangIndexRoute
+  '/blog/': typeof BlogIndexRoute
 }
 export interface FileRoutesByTo {
+  '/blog.png': typeof BlogDotpngRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/status': typeof ApiStatusRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/{$slug}.md': typeof BlogChar123slugChar125DotmdRoute
+  '/blog/{$slug}.png': typeof BlogChar123slugChar125DotpngRoute
   '/$lang': typeof LangIndexRoute
+  '/blog': typeof BlogIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/$lang': typeof LangRouteWithChildren
+  '/blog': typeof BlogRouteWithChildren
+  '/blog.png': typeof BlogDotpngRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/status': typeof ApiStatusRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/{$slug}.md': typeof BlogChar123slugChar125DotmdRoute
+  '/blog/{$slug}.png': typeof BlogChar123slugChar125DotpngRoute
   '/$lang/': typeof LangIndexRoute
+  '/blog/': typeof BlogIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/$lang' | '/api/status' | '/$lang/'
+  fullPaths:
+    | '/$lang'
+    | '/blog'
+    | '/blog.png'
+    | '/llms.txt'
+    | '/sitemap.xml'
+    | '/api/status'
+    | '/blog/$slug'
+    | '/blog/rss.xml'
+    | '/blog/{$slug}.md'
+    | '/blog/{$slug}.png'
+    | '/$lang/'
+    | '/blog/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/api/status' | '/$lang'
-  id: '__root__' | '/$lang' | '/api/status' | '/$lang/'
+  to:
+    | '/blog.png'
+    | '/llms.txt'
+    | '/sitemap.xml'
+    | '/api/status'
+    | '/blog/$slug'
+    | '/blog/rss.xml'
+    | '/blog/{$slug}.md'
+    | '/blog/{$slug}.png'
+    | '/$lang'
+    | '/blog'
+  id:
+    | '__root__'
+    | '/$lang'
+    | '/blog'
+    | '/blog.png'
+    | '/llms.txt'
+    | '/sitemap.xml'
+    | '/api/status'
+    | '/blog/$slug'
+    | '/blog/rss.xml'
+    | '/blog/{$slug}.md'
+    | '/blog/{$slug}.png'
+    | '/$lang/'
+    | '/blog/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   LangRoute: typeof LangRouteWithChildren
+  BlogRoute: typeof BlogRouteWithChildren
+  BlogDotpngRoute: typeof BlogDotpngRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiStatusRoute: typeof ApiStatusRoute
 }
 
@@ -64,6 +185,34 @@ declare module '@tanstack/react-router' {
       path: '/$lang'
       fullPath: '/$lang'
       preLoaderRoute: typeof LangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog.png': {
+      id: '/blog.png'
+      path: '/blog.png'
+      fullPath: '/blog.png'
+      preLoaderRoute: typeof BlogDotpngRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$lang/': {
@@ -80,6 +229,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/rss.xml': {
+      id: '/blog/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/blog/rss.xml'
+      preLoaderRoute: typeof BlogRssDotxmlRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/{$slug}.md': {
+      id: '/blog/{$slug}.md'
+      path: '/{$slug}.md'
+      fullPath: '/blog/{$slug}.md'
+      preLoaderRoute: typeof BlogChar123slugChar125DotmdRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/{$slug}.png': {
+      id: '/blog/{$slug}.png'
+      path: '/{$slug}.png'
+      fullPath: '/blog/{$slug}.png'
+      preLoaderRoute: typeof BlogChar123slugChar125DotpngRouteImport
+      parentRoute: typeof BlogRoute
+    }
   }
 }
 
@@ -93,8 +277,30 @@ const LangRouteChildren: LangRouteChildren = {
 
 const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogRssDotxmlRoute: typeof BlogRssDotxmlRoute
+  BlogChar123slugChar125DotmdRoute: typeof BlogChar123slugChar125DotmdRoute
+  BlogChar123slugChar125DotpngRoute: typeof BlogChar123slugChar125DotpngRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+  BlogRssDotxmlRoute: BlogRssDotxmlRoute,
+  BlogChar123slugChar125DotmdRoute: BlogChar123slugChar125DotmdRoute,
+  BlogChar123slugChar125DotpngRoute: BlogChar123slugChar125DotpngRoute,
+  BlogIndexRoute: BlogIndexRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   LangRoute: LangRouteWithChildren,
+  BlogRoute: BlogRouteWithChildren,
+  BlogDotpngRoute: BlogDotpngRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiStatusRoute: ApiStatusRoute,
 }
 export const routeTree = rootRouteImport

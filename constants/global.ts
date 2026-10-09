@@ -7,3 +7,4 @@ export const hasLocale = (locale: string): locale is Locale =>
 
 export const NAME = "Elwan";
 export const EMAIL = "mayencourt@elwan.ch";
+export const ORIGIN = "https://elwan.ch";

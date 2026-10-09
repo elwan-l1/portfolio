@@ -29,7 +29,7 @@ function RootDocument({ children }: { children: ReactNode }) {
   const { lang } = useParams({ strict: false });
 
   return (
-    <html lang={lang} className="h-full antialiased">
+    <html lang={lang ?? "en"} className="h-full antialiased">
       <head>
         <HeadContent />
       </head>

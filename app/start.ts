@@ -7,7 +7,8 @@ const defaultLocale = "en";
 
 const getLocale = (request: Request) => {
   const headers = { "accept-language": request.headers.get("accept-language") ?? "en" };
-  const languages = new Negotiator({ headers }).languages();
+  // `*` (sent by fetch and some crawlers) is not a language tag and makes `match` throw
+  const languages = new Negotiator({ headers }).languages().filter((language) => language !== "*");
 
   return match(languages, [...LANGUAGES], defaultLocale);
 };
@@ -20,6 +21,7 @@ const localeRedirect = createMiddleware().server(({ next, request }) => {
   if (hasLocale(first) || url.pathname.startsWith("/api/") || url.pathname.startsWith("/_")) {
     return next();
   }
+  if (first === "blog") return next();
   if (url.pathname.includes(".")) return next();
 
   const pathname = url.pathname === "/" ? "" : url.pathname;

@@ -82,7 +82,7 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
         className="bg-peach text-crust p-0! lg:col-span-2 lg:col-start-9 lg:row-start-2"
       >
         <a
-          href={`/${lang}/blog`}
+          href="/blog"
           className="group tall:p-6 flex h-full flex-col justify-between gap-3 p-5 no-underline"
         >
           <span className="flex items-baseline justify-between">

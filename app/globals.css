@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./mocha.css";
+@import "./post.css";
 
 @custom-variant tall (@media (min-height: 860px));
 
