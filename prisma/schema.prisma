@@ -156,3 +156,26 @@ model Machine {
   @@unique([switchId, port])
   @@map("machines")
 }
+
+model Admin {
+  id           Int            @id
+  username     String         @db.VarChar(64)
+  passwordHash String         @map("password_hash") @db.Char(97)
+  recoveryHash String         @map("recovery_hash") @db.Char(64)
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  sessions     AdminSession[]
+
+  @@map("admins")
+}
+
+model AdminSession {
+  id        String   @id @db.Char(64)
+  adminId   Int      @map("admin_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@map("admin_sessions")
+}

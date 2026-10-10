@@ -5,11 +5,9 @@ import { hash } from "@/lib/noise";
 const SIZE = 12;
 const CELL = SIZE * 0.6;
 const LINE = 14;
-// half the reading column
-const HALF = 384;
 // the dust stops a little inside the column, in its padding
 const INSET = 24;
-// the gradient the dust is coloured with, from the screen edge to the reading column
+// the gradient the dust is coloured with, from the screen edge to the column
 const RAMP = [
   "text-pink",
   "text-mauve",
@@ -38,8 +36,15 @@ const grain = (x: number, y: number, side: number) => {
 const LAYER =
   "font-text pointer-events-none absolute top-0 m-0 leading-none whitespace-pre select-none";
 
-/** While `reading`, both sides slide apart, the right one further at xl to clear the contents list. */
-export const BlogBackdrop = ({ reading }: { reading: boolean }) => {
+type DustProps = {
+  /** Width in px of the clear column in the middle of the screen. */
+  column?: number;
+  /** Slides both sides apart, the right one further at xl to clear the blog contents list. */
+  apart?: boolean;
+};
+
+/** Sparse grains in the margins, fading from pink at the screen edges to surface0 at the column. */
+export const Dust = ({ column = 768, apart = false }: DustProps) => {
   const layers = useRef<(HTMLPreElement | null)[]>([]);
 
   useEffect(() => {
@@ -47,7 +52,7 @@ export const BlogBackdrop = ({ reading }: { reading: boolean }) => {
       const half = innerWidth / 2;
       const cols = Math.ceil(half / CELL) + 1;
       const rows = Math.ceil(innerHeight / LINE) + 1;
-      const reach = half - HALF + INSET;
+      const reach = half - column / 2 + INSET;
       SIDES.forEach((_, side) => {
         const glyphs = new Array<string>(cols * rows).fill(" ");
         const inks = new Int8Array(cols * rows).fill(-1);
@@ -78,14 +83,14 @@ export const BlogBackdrop = ({ reading }: { reading: boolean }) => {
     paint();
     addEventListener("resize", paint);
     return () => removeEventListener("resize", paint);
-  }, []);
+  }, [column]);
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       {SIDES.map((name, side) => (
         <div
           key={name}
-          className={`absolute inset-y-0 w-1/2 transition-[translate] duration-700 ease-out motion-reduce:transition-none ${side ? "right-0" : "left-0"} ${reading ? (side ? "translate-x-30 xl:translate-x-62" : "-translate-x-30") : "translate-x-0"}`}
+          className={`absolute inset-y-0 w-1/2 transition-[translate] duration-700 ease-out motion-reduce:transition-none ${side ? "right-0" : "left-0"} ${apart ? (side ? "translate-x-30 xl:translate-x-62" : "-translate-x-30") : "translate-x-0"}`}
         >
           {RAMP.map((ink, i) => (
             <pre

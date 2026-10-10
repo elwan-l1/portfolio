@@ -1,0 +1,22 @@
+export const TEXT = {
+  admin: "Admin",
+  todo: "Todo",
+  home: "home",
+  setupIntro: "Pick the username and password of the only account.",
+  loginIntro: "Sign in to continue.",
+  recoverIntro: "Spend the recovery code to set a new password.",
+  username: "Username",
+  password: "Password",
+  newPassword: "New password",
+  recoveryCode: "Recovery code",
+  create: "Create account",
+  signIn: "Sign in",
+  reset: "Reset password",
+  useCode: "Lost the password? Use the recovery code",
+  back: "Back to sign in",
+  codeTitle: "Recovery code",
+  codeIntro:
+    "Save it somewhere safe. It is shown once and is the only way back in if the password is lost. Using it gives a new one.",
+  saved: "I saved it",
+  logout: "Sign out",
+};

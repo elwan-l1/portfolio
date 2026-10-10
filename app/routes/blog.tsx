@@ -1,4 +1,4 @@
-import { BlogBackdrop } from "@/components/blog/blog-backdrop";
+import { Dust } from "@/components/dust";
 import { Trail } from "@/components/trail";
 
 import { Outlet, createFileRoute, useParams } from "@tanstack/react-router";
@@ -10,7 +10,7 @@ const Blog = () => {
   return (
     <>
       <Trail />
-      <BlogBackdrop reading={!!slug} />
+      <Dust apart={!!slug} />
       <Outlet />
     </>
   );

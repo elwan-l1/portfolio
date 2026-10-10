@@ -5,6 +5,9 @@ import Negotiator from "negotiator";
 
 const defaultLocale = "en";
 
+// top-level sections served in one language only
+const UNLOCALIZED = new Set(["api", "blog", "admin"]);
+
 const getLocale = (request: Request) => {
   const headers = { "accept-language": request.headers.get("accept-language") ?? "en" };
   // `*` (sent by fetch and some crawlers) is not a language tag and makes `match` throw
@@ -18,10 +21,7 @@ const localeRedirect = createMiddleware().server(({ next, request }) => {
   const url = new URL(request.url);
   const [, first = ""] = url.pathname.split("/");
 
-  if (hasLocale(first) || url.pathname.startsWith("/api/") || url.pathname.startsWith("/_")) {
-    return next();
-  }
-  if (first === "blog") return next();
+  if (hasLocale(first) || UNLOCALIZED.has(first) || first.startsWith("_")) return next();
   if (url.pathname.includes(".")) return next();
 
   const pathname = url.pathname === "/" ? "" : url.pathname;
