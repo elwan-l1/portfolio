@@ -179,3 +179,56 @@ model AdminSession {
   @@index([adminId])
   @@map("admin_sessions")
 }
+
+enum TodoStatus {
+  todo
+  in_progress
+  in_review
+  done
+  cancelled
+}
+
+model TodoProject {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(80)
+  description String   @default("") @db.VarChar(300)
+  color       String   @db.VarChar(16)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  todos       Todo[]
+
+  @@map("todo_projects")
+}
+
+model Todo {
+  id          Int         @id @default(autoincrement())
+  projectId   Int         @map("project_id")
+  title       String      @db.VarChar(160)
+  description String      @db.Text
+  status      TodoStatus
+  startDate   DateTime?   @map("start_date") @db.Date
+  endDate     DateTime?   @map("end_date") @db.Date
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  project     TodoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tags        TodoTag[]   @relation("todo_tag_links")
+
+  @@index([projectId, status])
+  @@map("todos")
+}
+
+model TodoTag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique @db.VarChar(24)
+  color String @db.VarChar(16)
+  icon  String @db.VarChar(4)
+  todos Todo[] @relation("todo_tag_links")
+
+  @@map("todo_tags")
+}
+
+model TodoHiddenStatus {
+  status TodoStatus @id
+
+  @@map("todo_hidden_statuses")
+}

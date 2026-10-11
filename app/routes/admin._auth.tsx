@@ -12,7 +12,7 @@ const Shell = () => {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-6 sm:px-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-5 py-6 sm:px-8">
       <nav className="text-meta flex items-baseline justify-between gap-5">
         <a href="/" className="text-subtext0 hover:text-pink w-fit no-underline">
           ← {t.home}

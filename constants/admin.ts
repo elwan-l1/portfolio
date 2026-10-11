@@ -1,6 +1,5 @@
 export const TEXT = {
   admin: "Admin",
-  todo: "Todo",
   home: "home",
   setupIntro: "Pick the username and password of the only account.",
   loginIntro: "Sign in to continue.",
