@@ -1,5 +1,5 @@
 import { getStatus, login, logout, recover, setup } from "./auth.server";
-import { createServerFn } from "@tanstack/react-start";
+import { createMiddleware, createServerFn } from "@tanstack/react-start";
 
 type Credentials = { username: string; password: string };
 
@@ -8,6 +8,12 @@ const credentials = <T extends Credentials>(input: T) => {
     throw new Error("username and password must be strings");
   return input;
 };
+
+// route guards only stop rendering, so admin server functions check the session themselves
+export const adminOnly = createMiddleware({ type: "function" }).server(async ({ next }) => {
+  if ((await getStatus()) !== "in") throw new Error("Not signed in.");
+  return next();
+});
 
 export const getAuth = createServerFn({ method: "GET" }).handler(() => getStatus());
 

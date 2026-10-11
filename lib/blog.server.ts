@@ -1,3 +1,4 @@
+import { allowed } from "@/lib/limit.server";
 import { getPrisma } from "@/lib/prisma.server";
 
 import { createHighlighter } from "@tanstack/highlight/core";
@@ -142,6 +143,7 @@ export const renderMarkdown = (body: string) =>
   renderDocument(parseMarkdown(body, { headingIds: true }), { highlighter });
 
 export const addView = async (slug: string, source: string) => {
+  if (!allowed("view")) return;
   const prisma = getPrisma();
   await prisma.$transaction([
     prisma.blogPost.updateMany({

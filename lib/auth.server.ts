@@ -1,3 +1,4 @@
+import { allowed } from "./limit.server";
 import { getPrisma } from "./prisma.server";
 import { deleteCookie, getCookie, setCookie } from "@tanstack/react-start/server";
 import { argon2, createHash, randomBytes, timingSafeEqual } from "node:crypto";
@@ -78,6 +79,10 @@ const checkPassword = (password: string) => {
     throw new Error(`Password needs at least ${MIN_PASSWORD} characters.`);
 };
 
+const checkAttempts = () => {
+  if (!allowed("auth")) throw new Error("Too many attempts. Try again later.");
+};
+
 export const getStatus = async (): Promise<AuthStatus> => {
   const prisma = getPrisma();
   const token = getCookie(COOKIE);
@@ -110,6 +115,7 @@ export const setup = async (username: string, password: string) => {
 };
 
 export const login = async (username: string, password: string) => {
+  checkAttempts();
   const admin = await getPrisma().admin.findUnique({ where: { id: ADMIN_ID } });
   if (!admin) throw new Error("No account yet.");
 
@@ -122,6 +128,7 @@ export const login = async (username: string, password: string) => {
 
 /** Spends the recovery code: sets a new password, signs out everywhere, returns the next code. */
 export const recover = async (username: string, code: string, password: string) => {
+  checkAttempts();
   const prisma = getPrisma();
   const admin = await prisma.admin.findUnique({ where: { id: ADMIN_ID } });
   if (!admin) throw new Error("No account yet.");

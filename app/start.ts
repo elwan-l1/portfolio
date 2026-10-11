@@ -1,6 +1,6 @@
 import { LANGUAGES, hasLocale } from "@/constants/global";
 import { match } from "@formatjs/intl-localematcher";
-import { createMiddleware, createStart } from "@tanstack/react-start";
+import { createCsrfMiddleware, createMiddleware, createStart } from "@tanstack/react-start";
 import Negotiator from "negotiator";
 
 const defaultLocale = "en";
@@ -31,4 +31,6 @@ const localeRedirect = createMiddleware().server(({ next, request }) => {
   });
 });
 
-export const startInstance = createStart(() => ({ requestMiddleware: [localeRedirect] }));
+const csrf = createCsrfMiddleware({ filter: ({ handlerType }) => handlerType === "serverFn" });
+
+export const startInstance = createStart(() => ({ requestMiddleware: [csrf, localeRedirect] }));
