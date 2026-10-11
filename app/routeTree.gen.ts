@@ -24,6 +24,8 @@ import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as BlogRssDotxmlRouteImport } from './routes/blog.rss[.]xml'
 import { Route as BlogChar123slugChar125DotmdRouteImport } from './routes/blog.{$slug}[.]md'
 import { Route as BlogChar123slugChar125DotpngRouteImport } from './routes/blog.{$slug}[.]png'
+import { Route as CardsChar123idChar125DotsvgRouteImport } from './routes/cards.{$id}[.]svg'
+import { Route as AdminAuthCardsRouteImport } from './routes/admin._auth.cards'
 import { Route as AdminAuthTodoRouteImport } from './routes/admin._auth.todo'
 
 const LangRoute = LangRouteImport.update({
@@ -102,6 +104,17 @@ const BlogChar123slugChar125DotpngRoute =
     path: '/{$slug}.png',
     getParentRoute: () => BlogRoute,
   } as any)
+const CardsChar123idChar125DotsvgRoute =
+  CardsChar123idChar125DotsvgRouteImport.update({
+    id: '/cards/{$id}.svg',
+    path: '/cards/{$id}.svg',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminAuthCardsRoute = AdminAuthCardsRouteImport.update({
+  id: '/cards',
+  path: '/cards',
+  getParentRoute: () => AdminAuthRoute,
+} as any)
 const AdminAuthTodoRoute = AdminAuthTodoRouteImport.update({
   id: '/todo',
   path: '/todo',
@@ -120,9 +133,11 @@ export interface FileRoutesByFullPath {
   '/blog/rss.xml': typeof BlogRssDotxmlRoute
   '/blog/{$slug}.md': typeof BlogChar123slugChar125DotmdRoute
   '/blog/{$slug}.png': typeof BlogChar123slugChar125DotpngRoute
+  '/cards/{$id}.svg': typeof CardsChar123idChar125DotsvgRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/admin/cards': typeof AdminAuthCardsRoute
   '/admin/todo': typeof AdminAuthTodoRoute
 }
 export interface FileRoutesByTo {
@@ -135,8 +150,10 @@ export interface FileRoutesByTo {
   '/blog/rss.xml': typeof BlogRssDotxmlRoute
   '/blog/{$slug}.md': typeof BlogChar123slugChar125DotmdRoute
   '/blog/{$slug}.png': typeof BlogChar123slugChar125DotpngRoute
+  '/cards/{$id}.svg': typeof CardsChar123idChar125DotsvgRoute
   '/$lang': typeof LangIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/admin/cards': typeof AdminAuthCardsRoute
   '/admin/todo': typeof AdminAuthTodoRoute
 }
 export interface FileRoutesById {
@@ -153,9 +170,11 @@ export interface FileRoutesById {
   '/blog/rss.xml': typeof BlogRssDotxmlRoute
   '/blog/{$slug}.md': typeof BlogChar123slugChar125DotmdRoute
   '/blog/{$slug}.png': typeof BlogChar123slugChar125DotpngRoute
+  '/cards/{$id}.svg': typeof CardsChar123idChar125DotsvgRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/admin/_auth/cards': typeof AdminAuthCardsRoute
   '/admin/_auth/todo': typeof AdminAuthTodoRoute
 }
 export interface FileRouteTypes {
@@ -172,9 +191,11 @@ export interface FileRouteTypes {
     | '/blog/rss.xml'
     | '/blog/{$slug}.md'
     | '/blog/{$slug}.png'
+    | '/cards/{$id}.svg'
     | '/$lang/'
     | '/admin/'
     | '/blog/'
+    | '/admin/cards'
     | '/admin/todo'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -187,8 +208,10 @@ export interface FileRouteTypes {
     | '/blog/rss.xml'
     | '/blog/{$slug}.md'
     | '/blog/{$slug}.png'
+    | '/cards/{$id}.svg'
     | '/$lang'
     | '/blog'
+    | '/admin/cards'
     | '/admin/todo'
   id:
     | '__root__'
@@ -204,9 +227,11 @@ export interface FileRouteTypes {
     | '/blog/rss.xml'
     | '/blog/{$slug}.md'
     | '/blog/{$slug}.png'
+    | '/cards/{$id}.svg'
     | '/$lang/'
     | '/admin/'
     | '/blog/'
+    | '/admin/_auth/cards'
     | '/admin/_auth/todo'
   fileRoutesById: FileRoutesById
 }
@@ -218,6 +243,7 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiStatusRoute: typeof ApiStatusRoute
+  CardsChar123idChar125DotsvgRoute: typeof CardsChar123idChar125DotsvgRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -327,6 +353,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogChar123slugChar125DotpngRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/cards/{$id}.svg': {
+      id: '/cards/{$id}.svg'
+      path: '/cards/{$id}.svg'
+      fullPath: '/cards/{$id}.svg'
+      preLoaderRoute: typeof CardsChar123idChar125DotsvgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/_auth/cards': {
+      id: '/admin/_auth/cards'
+      path: '/cards'
+      fullPath: '/admin/cards'
+      preLoaderRoute: typeof AdminAuthCardsRouteImport
+      parentRoute: typeof AdminAuthRoute
+    }
     '/admin/_auth/todo': {
       id: '/admin/_auth/todo'
       path: '/todo'
@@ -348,10 +388,12 @@ const LangRouteChildren: LangRouteChildren = {
 const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 
 interface AdminAuthRouteChildren {
+  AdminAuthCardsRoute: typeof AdminAuthCardsRoute
   AdminAuthTodoRoute: typeof AdminAuthTodoRoute
 }
 
 const AdminAuthRouteChildren: AdminAuthRouteChildren = {
+  AdminAuthCardsRoute: AdminAuthCardsRoute,
   AdminAuthTodoRoute: AdminAuthTodoRoute,
 }
 
@@ -397,6 +439,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiStatusRoute: ApiStatusRoute,
+  CardsChar123idChar125DotsvgRoute: CardsChar123idChar125DotsvgRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

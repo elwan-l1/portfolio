@@ -1,6 +1,10 @@
 export const TEXT = {
   admin: "Admin",
   home: "home",
+  pages: [
+    { to: "/admin/todo", label: "todo" },
+    { to: "/admin/cards", label: "cards" },
+  ] as const,
   setupIntro: "Pick the username and password of the only account.",
   loginIntro: "Sign in to continue.",
   recoverIntro: "Spend the recovery code to set a new password.",

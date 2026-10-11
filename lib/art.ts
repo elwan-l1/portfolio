@@ -1,3 +1,5 @@
+import { hash } from "./noise";
+
 // compact art format, written by scripts/encode-art.ts
 // line 1: id, cols, rows, palette
 // line 2: colour runs over ink cells only, comma separated: colour digit then count
@@ -17,6 +19,44 @@ export type Art = {
 
 /** Glyphs of the generated post art, lightest to densest. */
 export const RAMP = ["▒", "%", "$", "#", "M", "W", "@", "▓", "█"];
+
+const INKS = ["#CBA6F7", "#FFFFFF", "#FFBFE9"];
+const SHADE = "#7f849c";
+
+/** A sparse grain in empty space: mostly `·`, some `+`, rarely `@`. */
+export const dust = (x: number, y: number, amount = 0.045) => {
+  if (hash(x, y, 11) > amount) return;
+  const r = hash(x, y, 12);
+  return {
+    glyph: r < 0.8 ? "·" : r < 0.93 ? "+" : "@",
+    color: INKS[Math.floor(hash(x, y, 13) * INKS.length)],
+  };
+};
+
+/** Colour of a cell: white where dense, mauve, pink and grey where faint. */
+export const tint = (x: number, y: number, density: number) => {
+  if (density > 0.8) return INKS[1];
+  const r = hash(x, y, 14);
+  if (density > 0.5) return r < 0.7 ? INKS[1] : r < 0.85 ? INKS[0] : INKS[2];
+  return r < 0.4 ? INKS[0] : r < 0.65 ? INKS[2] : r < 0.85 ? SHADE : INKS[1];
+};
+
+/** Colour of a glyph of plain art text, worked out again from its place in the ramp. */
+export const inkOf = (glyph: string, x: number, y: number) => {
+  const step = RAMP.indexOf(glyph);
+  return step < 0 ? dust(x, y, 1)!.color : tint(x, y, (step + 0.5) / RAMP.length);
+};
+
+/** Plain art text from brightness levels in 0..1, one per cell, row by row. */
+export const toAscii = (levels: number[], cols: number, cutoff: number, amount: number) =>
+  Array.from({ length: levels.length / cols }, (_, y) =>
+    Array.from({ length: cols }, (_, x) => {
+      // a little grain so the glyphs do not fall into clean bands
+      const density = levels[y * cols + x] + (hash(x, y, 7) - 0.5) * 0.12;
+      if (density < cutoff) return dust(x, y, amount)?.glyph ?? " ";
+      return RAMP[Math.min(RAMP.length - 1, Math.floor(density * RAMP.length))];
+    }).join(""),
+  ).join("\n");
 
 export const GLYPHS: Record<string, string> = { a: "▒", b: "▓", c: "█", d: "&" };
 

@@ -1,6 +1,6 @@
 import { defineMiddleware } from "nitro";
 
-const COMPRESSIBLE = /^(text\/html|application\/json)/;
+const COMPRESSIBLE = /^(text\/html|application\/json|image\/svg\+xml)/;
 
 // nitro compresses only prebuilt assets, so server-rendered responses are gzipped here
 export default defineMiddleware(async (event, next) => {

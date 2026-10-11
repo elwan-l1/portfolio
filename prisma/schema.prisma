@@ -232,3 +232,30 @@ model TodoHiddenStatus {
 
   @@map("todo_hidden_statuses")
 }
+
+enum CardLayout {
+  grid
+  list
+  chips
+  art
+}
+
+enum CardSize {
+  s
+  l
+  xl
+}
+
+model Card {
+  id        String     @id @default(uuid()) @db.Char(36)
+  title     String     @db.VarChar(40)
+  glyph     String     @db.VarChar(4)
+  color     String     @db.VarChar(16)
+  layout    CardLayout
+  size      CardSize   @default(l)
+  items     String     @db.Text
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  @@map("cards")
+}

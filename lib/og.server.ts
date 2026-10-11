@@ -1,4 +1,4 @@
-import { RAMP, decode } from "@/lib/art";
+import { RAMP, decode, dust, tint } from "@/lib/art";
 import { hash } from "@/lib/noise";
 
 import font from "@/assets/glyphs";
@@ -12,8 +12,6 @@ const X0 = Math.floor((WIDTH - COLS * font.width) / 2);
 const Y0 = Math.floor((HEIGHT - ROWS * font.height) / 2);
 
 const BACKGROUND = "#11111b";
-const INKS = ["#CBA6F7", "#FFFFFF", "#FFBFE9"];
-const SHADE = "#7f849c";
 
 const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 const alpha = Buffer.from(font.alpha, "base64");
@@ -63,15 +61,6 @@ const render = (cell: (col: number, row: number) => Cell) => {
     chunk("IDAT", deflateSync(pixels)),
     chunk("IEND", new Uint8Array()),
   ]);
-};
-
-const dust = (col: number, row: number): Cell => {
-  if (hash(col, row, 11) > 0.045) return;
-  const r = hash(col, row, 12);
-  return {
-    glyph: r < 0.8 ? "·" : r < 0.93 ? "+" : "@",
-    color: INKS[Math.floor(hash(col, row, 13) * INKS.length)],
-  };
 };
 
 // renders are pure, so each one is drawn once per process
@@ -181,13 +170,6 @@ const brightness = (u: number, v: number, x: number, y: number) => {
   const [nx, ny, nz] = unit(-dx * 2.2, -dy * 2.2, 1);
   const lit = clamp(nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]);
   return Math.max(glow, clamp(albedo * (0.3 + 0.8 * lit) + lit ** 14 * 0.35));
-};
-
-const tint = (x: number, y: number, density: number) => {
-  if (density > 0.8) return INKS[1];
-  const r = hash(x, y, 14);
-  if (density > 0.5) return r < 0.7 ? INKS[1] : r < 0.85 ? INKS[0] : INKS[2];
-  return r < 0.4 ? INKS[0] : r < 0.65 ? INKS[2] : r < 0.85 ? SHADE : INKS[1];
 };
 
 export const blogImage = () =>
