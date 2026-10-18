@@ -73,10 +73,10 @@ const interests = [
     text: "Tiny programs that run once per pixel and turn a bit of math into light.",
   },
   {
-    slug: "creative-coding",
+    slug: "modular-synth",
     glyph: "#",
-    name: "Creative coding",
-    text: "Code as a sketchbook: small experiments made to be looked at, not shipped.",
+    name: "Modular synth",
+    text: "Oscillators, filters and cables, patched until something drifts.",
   },
   {
     slug: "homelab",
@@ -372,6 +372,8 @@ async function main() {
       });
     }
 
+    // an interest dropped from the list goes, its translations with it
+    await tx.interest.deleteMany({ where: { slug: { notIn: interests.map(({ slug }) => slug) } } });
     for (const [position, { slug, glyph, name, text }] of interests.entries()) {
       const interest = await tx.interest.upsert({
         where: { slug },

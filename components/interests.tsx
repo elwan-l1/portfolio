@@ -20,6 +20,9 @@ const Printer = lazy(() =>
 const Shader = lazy(() =>
   import("@/components/shader").then(({ Shader }) => ({ default: Shader })),
 );
+const Synth = lazy(() =>
+  import("@/components/synth/synth").then(({ Synth }) => ({ default: Synth })),
+);
 
 const SIZE = 11; // px
 const COVER = 260; // ms for the glyphs to cover the card
@@ -115,6 +118,7 @@ const Panel = ({ interest, lab }: { interest: Interest; lab: HomeContent["homela
   if (interest.slug === "3d-printing") return <Printer />;
   if (interest.slug === "shaders") return <Shader fallback={interest.text} />;
   if (interest.slug === "fpv") return <Fpv />;
+  if (interest.slug === "modular-synth") return <Synth />;
   return <p className="text-lead m-0 leading-snug font-bold tracking-[-0.02em]">{interest.text}</p>;
 };
 
