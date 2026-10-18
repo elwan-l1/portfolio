@@ -3,6 +3,7 @@ import { FitText } from "@/components/fit-text";
 import { Interests } from "@/components/interests";
 import { LanguageSwitch } from "@/components/language-switch";
 import { Penalty } from "@/components/penalty";
+import { SoundToggle } from "@/components/sound-toggle";
 import { Fig, Tile } from "@/components/tile";
 import { Title } from "@/components/title";
 import { Letters } from "@/components/trail";
@@ -22,6 +23,9 @@ type PortfolioHomeProps = {
   content: HomeContent;
 };
 
+// the L1 in the pupil of the eye, in cells of the art
+const EYE_MARK = { x0: 64, y0: 26, x1: 80, y1: 35 };
+
 const ROW =
   "grid w-full grid-cols-[4ch_minmax(0,1fr)] content-center gap-x-3 gap-y-0.5 py-2 text-subtext0 lg:grid-cols-[16ch_minmax(0,1fr)] lg:items-baseline lg:py-1 xl:grid-cols-[4ch_16ch_minmax(0,1fr)]";
 
@@ -33,7 +37,10 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
       {/* who */}
       <Tile className="bg-mantle tall:gap-5 flex flex-col justify-between gap-3 lg:col-span-4 lg:row-span-2">
         <div className="tall:top-6 tall:right-6 absolute top-5 right-5">
-          <LanguageSwitch lang={lang} />
+          <div className="flex flex-col items-end gap-1">
+            <LanguageSwitch lang={lang} />
+            <SoundToggle label={t.sound} by={t.soundBy} />
+          </div>
         </div>
         <div>
           <h1 className="text-text m-0 w-[62%] font-bold">
@@ -156,8 +163,12 @@ const PortfolioHome = ({ lang, dictionary: t, content }: PortfolioHomeProps) => 
 
       {/* the eye */}
       <Tile as="figure" className="bg-crust flex flex-col gap-3 overflow-hidden lg:col-span-3">
-        <Field art={eye} air={4} label={t.eyeLabel} />
-        <Fig n={2} label={t.fig}>
+        <Field art={eye} air={4} label={t.eyeLabel} reel={EYE_MARK} bleed={24} />
+        <Fig
+          n={2}
+          label={t.fig}
+          className="bg-crust relative -mt-1 -mb-1 -ml-2 self-start px-2 py-1"
+        >
           {t.eye}
         </Fig>
       </Tile>

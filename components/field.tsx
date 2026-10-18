@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { Ascii } from "@/components/ascii";
+import { Reel, type Region } from "@/components/reel";
 
 import { decode } from "@/lib/art";
 import { lambda } from "@/lib/lambda";
+import { revealOf, seedOf } from "@/lib/reveal";
 import { artAdvance, useBox, useFitted, useFonts } from "@/lib/type";
 
 const GLYPHS = "▒▓█@#MW$&%";
@@ -29,10 +31,6 @@ const smooth = (x: number, y: number, seed: number) => {
   return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
 };
 
-// a fixed seed per artwork, so its field keeps the same pattern through resizes
-const seedOf = (id: string) =>
-  [...id].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619), 2166136261) >>> 12;
-
 type Grid = { cols: number; rows: number; x0: number; y0: number };
 
 type WeightsProps = {
@@ -45,7 +43,8 @@ type WeightsProps = {
 
 /**
  * One text layer per ink, stacked. A weight is a glyph in the layer of its ink,
- * or a space once λ passes its magnitude. Cells under the art stay blank.
+ * or a space once λ passes its magnitude. The cells of the art are weights too: the wall draws
+ * a glyph there until λ lets the art's own letter through (lib/reveal.ts).
  */
 const Weights = ({ grid, taken, seed, cw, size }: WeightsProps) => {
   const layers = useRef<(HTMLPreElement | null)[]>([]);
@@ -66,10 +65,7 @@ const Weights = ({ grid, taken, seed, cw, size }: WeightsProps) => {
     for (let c = 0; c < n; c++) {
       const i = c % cols;
       const j = (c - i) / cols;
-      if (taken(x0 + i, y0 + j)) {
-        magnitude[c] = -1; // the art: never drawn here, never zero
-        continue;
-      }
+      if (taken(x0 + i, y0 + j)) magnitude[c] = revealOf(x0 + i, y0 + j, seed);
       const r = hash(i, j, seed + 2);
       glyph[c] = magnitude[c] > STAR ? "@" : GLYPHS[Math.floor(r * GLYPHS.length)];
       ink[c] = r < 0.3 ? 1 : r < 0.7 ? 0 : 2;
@@ -127,6 +123,13 @@ type FieldProps = {
   reserve?: number;
   /** Rows of weights above the art on a narrow screen. */
   air?: number;
+  /** A part of the art that turns while the music plays. */
+  reel?: Region;
+  /**
+   * Px the wall of weights runs on past the left, right and top of the box, under a card's padding.
+   * It also runs on to the card's bottom edge, under whatever sits below the box.
+   */
+  bleed?: number;
 };
 
 /**
@@ -140,11 +143,23 @@ export const Field = ({
   inset = 0,
   reserve = 0,
   air = 6,
+  reel,
+  bleed = 0,
 }: FieldProps) => {
   const ready = useFonts();
   const fitted = useFitted();
   const [ref, { w, h }] = useBox<HTMLDivElement>();
   const art = useMemo(() => decode(encoded), [encoded]);
+
+  // how far the card runs on below the box
+  const [below, setBelow] = useState(0);
+  useLayoutEffect(() => {
+    if (!bleed) return;
+    const box = ref.current!;
+    setBelow(
+      box.parentElement!.getBoundingClientRect().bottom - box.getBoundingClientRect().bottom,
+    );
+  }, [ref, bleed, w, h]);
 
   const advance = artAdvance(ready);
   const byWidth = (w - 2 * inset) / (art.cols * advance);
@@ -160,10 +175,10 @@ export const Field = ({
   const taken = useMemo(() => (x: number, y: number) => (art.plain[y]?.[x] ?? " ") !== " ", [art]);
 
   // whole cells, so the field is only rebuilt when a row or column comes or goes
-  const x0 = size ? -Math.ceil(left / cw) : 0;
-  const y0 = size ? -Math.ceil(top / size) : 0;
-  const cols = size ? Math.ceil((w - left) / cw) - x0 : 0;
-  const rows = size ? Math.ceil((boxH - top) / size) - y0 : 0;
+  const x0 = size ? -Math.ceil((left + bleed) / cw) : 0;
+  const y0 = size ? -Math.ceil((top + bleed) / size) : 0;
+  const cols = size ? Math.ceil((w - left + bleed) / cw) - x0 : 0;
+  const rows = size ? Math.ceil((boxH - top + below) / size) - y0 : 0;
   const grid = useMemo<Grid | null>(
     () => (cols && rows ? { cols, rows, x0, y0 } : null),
     [cols, rows, x0, y0],
@@ -172,13 +187,14 @@ export const Field = ({
   return (
     <div
       ref={ref}
-      className={fitted ? "relative min-h-0 flex-1 overflow-hidden" : "relative overflow-hidden"}
+      className={`relative ${fitted ? "min-h-0 flex-1" : ""} ${bleed ? "" : "overflow-hidden"}`}
       style={fitted ? undefined : { height: boxH }}
     >
       {size > 0 && grid && (
         <div className="absolute" style={{ left, top }}>
           <Weights grid={grid} taken={taken} seed={seedOf(art.id)} cw={cw} size={size} />
-          <Ascii art={art} size={size} label={label} />
+          <Ascii art={art} size={size} label={label} beat={!!reel} />
+          {reel && <Reel art={art} region={reel} size={size} cw={cw} />}
         </div>
       )}
     </div>

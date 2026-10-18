@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { signal } from "@/lib/sound";
+
 export const CHARS = "L1█";
 const COLORS = ["#CBA6F7", "#FFFFFF", "#FFBFE9"];
 
@@ -14,6 +16,12 @@ const WAVE_TIME = 900; // ms for a glitch to run through the text the cursor tou
 const WAVE_REACH = 0.55; // share of that text's diagonal it covers before dying out
 const WAVE_FLICKER = 0.2; // chance per frame that a glitching letter changes
 const REARM = 250; // ms before the same text can glitch again
+
+const RING_SPEED = 60; // cells a bass hit's ring travels per second
+const RING_WIDTH = 6; // cells thick
+const RING_STRAYS = 0.3; // share of letters that flash once as a stray glyph near the ring
+const RING_STRAY_SPREAD = 4.5; // cells, the average distance of a stray from the ring
+const RING_STRAY_REACH = 12; // cells, the furthest a stray gets
 
 const pick = <T,>(s: ArrayLike<T>) => s[Math.floor(Math.random() * s.length)];
 
@@ -33,19 +41,27 @@ export const Trail = () => {
 
   useEffect(() => {
     const box = layer.current!;
-    if (!matchMedia("(pointer: fine)").matches) return;
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const mouse = matchMedia("(pointer: fine)").matches;
 
     const until = new Map<number, number>(); // grid cell to when it goes dark
     const lit = new Map<number, HTMLSpanElement>();
     const pool: HTMLSpanElement[] = [];
+    // a letter glitches during each of its windows; a wave of the cursor joins the window it
+    // overlaps, the rings of the music each get their own
     const letters = new Map<
       HTMLElement,
-      { from: number; to: number; text: string; hit?: boolean }
+      { text: string; windows: { from: number; to: number; hit?: boolean }[]; shown: boolean }
     >();
     const lastWave = new WeakMap<Element, number>();
     let armed = true; // cursor left every letter since the last glitch
     let raf = 0;
+
+    const entry = (el: HTMLElement) => {
+      let l = letters.get(el);
+      if (!l) letters.set(el, (l = { text: el.textContent!, windows: [], shown: false }));
+      return l;
+    };
 
     const light = (key: number, gx: number, gy: number, t: number) => {
       until.set(key, Math.max(until.get(key) ?? 0, t));
@@ -62,21 +78,50 @@ export const Trail = () => {
       lit.set(key, el);
     };
 
-    const spread = (text: Element, origin: Element, now: number) => {
-      const start = centre(origin);
+    // every read comes before any write: a read after a write lays the page out again, which for
+    // a few thousand letters, once a wave is already running, froze the page for seconds
+    const spread = (text: Element, start: { x: number; y: number }, now: number) => {
       const bounds = text.getBoundingClientRect();
       const reach = WAVE_REACH * Math.hypot(bounds.width, bounds.height);
+      const reached: { el: HTMLElement; d: number }[] = [];
       for (const el of text.querySelectorAll<HTMLElement>("[data-letter]")) {
         const { x, y } = centre(el);
         const d = Math.hypot(x - start.x, y - start.y) / reach;
-        if (d > 1) continue;
+        if (d <= 1) reached.push({ el, d });
+      }
+      for (const { el, d } of reached) {
         const from = now + d * WAVE_TIME;
         const to = from + 200 + 400 * (1 - d) + Math.random() * 100;
-        // a letter still glitching from the last wave resets, so the new one shows at once
-        const original = letters.get(el)?.text ?? el.textContent!;
-        write(el, original);
-        el.style.color = "";
-        letters.set(el, { from, to, text: original });
+        const { windows } = entry(el);
+        // a letter still glitching from the last wave keeps going: the new wave joins it, so the
+        // old one is never cut off
+        const running = windows.find((w) => w.from <= to && from <= w.to);
+        if (running) {
+          running.from = Math.min(running.from, from);
+          running.to = Math.max(running.to, to);
+        } else windows.push({ from, to });
+      }
+    };
+
+    // a round ring runs out from `start`: each letter glitches for the moment it passes over it, so
+    // only the ring is lit and the art behind it is left alone. Some letters near it, ahead and
+    // behind, flash on their own: the noise round its edges.
+    const shock = (art: Element, start: { x: number; y: number }, now: number) => {
+      const all = Array.from(art.querySelectorAll<HTMLElement>("[data-letter]"), (el) => ({
+        el,
+        ...centre(el),
+      }));
+      const cell = all[0]?.el.getBoundingClientRect().width ?? 1;
+      const at = (radius: number) => now + (radius / RING_SPEED) * 1000;
+      for (const { el, x, y } of all) {
+        const r = Math.hypot(x - start.x, y - start.y) / cell;
+        const { windows } = entry(el);
+        windows.push({ from: at(r), to: at(r + RING_WIDTH) });
+        if (Math.random() >= RING_STRAYS) continue;
+        const gap = Math.min(RING_STRAY_REACH, -Math.log(1 - Math.random()) * RING_STRAY_SPREAD);
+        // when the ring is `gap` cells short of the letter, or `gap` cells past it
+        const from = at(Math.random() < 0.5 ? r - gap : r + gap + RING_WIDTH);
+        windows.push({ from, to: from + 40 + Math.random() * 80 });
       }
     };
 
@@ -93,15 +138,27 @@ export const Trail = () => {
         }
       }
       for (const [el, l] of letters) {
-        if (now >= l.to) {
+        let live: (typeof l.windows)[number] | undefined;
+        let kept = 0;
+        for (const w of l.windows) {
+          if (now >= w.to) continue;
+          l.windows[kept++] = w;
+          if (now >= w.from) live = w;
+        }
+        l.windows.length = kept;
+        if (live) {
+          if (!live.hit || Math.random() < WAVE_FLICKER) {
+            live.hit = true;
+            write(el, pick(CHARS));
+            el.style.color = pick(COLORS);
+            l.shown = true;
+          }
+        } else if (l.shown) {
           write(el, l.text);
           el.style.color = "";
-          letters.delete(el);
-        } else if (now >= l.from && (!l.hit || Math.random() < WAVE_FLICKER)) {
-          l.hit = true;
-          write(el, pick(CHARS));
-          el.style.color = pick(COLORS);
+          l.shown = false;
         }
+        if (!kept && !l.shown) letters.delete(el);
       }
       raf = lit.size || letters.size ? requestAnimationFrame(frame) : 0;
     };
@@ -127,7 +184,7 @@ export const Trail = () => {
         (text && selection && !selection.isCollapsed && selection.containsNode(text, true));
       if (!letter) armed = true;
       else if (text && armed && !selecting && now - (lastWave.get(text) ?? -Infinity) > REARM) {
-        spread(text, letter, now);
+        spread(text, centre(letter), now);
         lastWave.set(text, now);
         armed = false;
       }
@@ -136,16 +193,32 @@ export const Trail = () => {
 
     const settle = () => {
       for (const [el, l] of letters) {
+        if (!l.shown) continue;
         write(el, l.text);
         el.style.color = "";
       }
       letters.clear();
     };
 
-    window.addEventListener("pointermove", move, { passive: true });
-    // selecting starts on the real text, not on a glitch
-    window.addEventListener("pointerdown", settle);
+    // a big bass hit sends a ring out from the middle of the art made for it
+    const beat = () => {
+      const now = performance.now();
+      for (const art of document.querySelectorAll<HTMLElement>("[data-beat]")) {
+        const { top, bottom, left, right } = art.getBoundingClientRect();
+        if (bottom < 0 || top > innerHeight) continue;
+        shock(art, { x: (left + right) / 2, y: (top + bottom) / 2 }, now);
+      }
+      raf ||= requestAnimationFrame(frame);
+    };
+    const unsignal = signal.subscribe((s) => s.hit && beat());
+
+    if (mouse) {
+      window.addEventListener("pointermove", move, { passive: true });
+      // selecting starts on the real text, not on a glitch
+      window.addEventListener("pointerdown", settle);
+    }
     return () => {
+      unsignal();
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerdown", settle);

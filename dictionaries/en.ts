@@ -10,7 +10,7 @@ export const en: Dictionary = {
   fig: "fig.",
   skeleton: "Data engineer at work.",
   skeletonLabel: "A skeleton streaming binary digits into a laptop, drawn in text",
-  eye: "Eye study.",
+  eye: "Eye!",
   eyeLabel: "A close-up eye with long lashes and an L1 mark in the pupil, drawn in text",
   uses: "Uses",
   blog: "Blog",
@@ -19,4 +19,6 @@ export const en: Dictionary = {
   interests: "Interests",
   interestsBack: "interests",
   projects: "Projects",
+  sound: "sound",
+  soundBy: "by",
 };

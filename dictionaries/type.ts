@@ -14,4 +14,6 @@ export type Dictionary = {
   interests: string;
   interestsBack: string;
   projects: string;
+  sound: string;
+  soundBy: string;
 };

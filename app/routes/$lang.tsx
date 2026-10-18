@@ -1,4 +1,5 @@
 import { ConsoleLogo } from "@/components/console-logo";
+import { Motes } from "@/components/motes";
 import { Trail } from "@/components/trail";
 
 import { hasLocale } from "@/constants/global";
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/$lang")({
   component: () => (
     <>
       <Trail />
+      <Motes />
       <ConsoleLogo />
       <Outlet />
     </>
