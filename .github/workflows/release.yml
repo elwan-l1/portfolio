@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Infomaniak
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    environment:
+      name: production
+      url: ${{ vars.SITE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check tag, version and changelog
+        run: |
+          version=$(jq -r .version package.json)
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "tag $GITHUB_REF_NAME does not match package.json version $version" >&2
+            exit 1
+          fi
+          sh scripts/changelog.sh "$version" > /dev/null
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # the server installs only the Prisma CLI, so the schema engine matches its platform
+      - name: Package release
+        run: |
+          mkdir -p release/prisma
+          cp -R .output release/
+          cp -R prisma/schema.prisma prisma/migrations release/prisma/
+          cp prisma.config.ts scripts/serve.sh scripts/activate.sh release/
+          node -e '
+            const version = (name) => require(name + "/package.json").version;
+            const dependencies = { prisma: version("prisma"), dotenv: version("dotenv") };
+            console.log(JSON.stringify({ private: true, dependencies }));
+          ' > release/package.json
+
+      # Node.js sites on Infomaniak take no SSH key, only the account password
+      - name: Setup SSH
+        env:
+          KNOWN_HOSTS: ${{ vars.INFOMANIAK_KNOWN_HOSTS }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends sshpass
+          mkdir -p ~/.ssh
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # activate.sh rolls back the release and the database when anything fails
+      - name: Upload and activate
+        env:
+          SSHPASS: ${{ secrets.INFOMANIAK_SSH_PASSWORD }}
+          SSH_TARGET: ${{ vars.INFOMANIAK_SSH_USER }}@${{ vars.INFOMANIAK_SSH_HOST }}
+          SITE_DIR: ${{ vars.INFOMANIAK_SITE_DIR }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          dir="releases/$GITHUB_REF_NAME"
+          tar -czf - -C release . | sshpass -e ssh "$SSH_TARGET" \
+            "cd '$SITE_DIR' && rm -rf '$dir' && mkdir -p '$dir' && tar -xzf - -C '$dir' && sh '$dir/activate.sh' '$GITHUB_REF_NAME' '$SITE_URL'"
+
+  release:
+    name: GitHub release
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Create release from changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sh scripts/changelog.sh "${GITHUB_REF_NAME#v}" > notes.md
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md --verify-tag

@@ -36,6 +36,9 @@
 - `prisma/`: schema, migrations, seed.
 - `generated/prisma/`: Prisma client. Generated on install, gitignored.
 - `compose.yml`: MySQL.
+- `.github/workflows/release.yml`: on `v*` tag, deploy to Infomaniak over SSH, then
+  GitHub release from `CHANGELOG.md`. `scripts/activate.sh` (migrate, switch release)
+  and `scripts/serve.sh` (start command, restarts on switch) run on the server.
 
 ## Architecture
 
