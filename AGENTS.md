@@ -11,7 +11,7 @@
 - Tailwind CSS 4 through `@tailwindcss/vite`. Theme tokens in `app/mocha.css`.
 - Prisma 7 + MySQL 9.7 in Docker. MariaDB driver adapter. Stay on Prisma 7 until
   8 stable.
-- pnpm 11, Node 26. oxlint, oxfmt, pre-commit. GitHub Actions CI.
+- pnpm 11, Node 24 in CI and on Infomaniak (24.7+ for `crypto.argon2`). oxlint, oxfmt, pre-commit. GitHub Actions CI.
 - Commands: `pnpm dev`, `pnpm build`, `pnpm start` (runs `.output`, build
   first), `pnpm check` (all hooks), `pnpm db:up`, `pnpm db:migrate`,
   `pnpm db:seed`, `pnpm db:studio`.
