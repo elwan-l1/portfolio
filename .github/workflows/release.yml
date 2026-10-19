@@ -66,7 +66,7 @@ jobs:
       # Node.js sites on Infomaniak take no SSH key, only the account password
       - name: Setup SSH
         env:
-          KNOWN_HOSTS: ${{ vars.INFOMANIAK_KNOWN_HOSTS }}
+          KNOWN_HOSTS: ${{ secrets.INFOMANIAK_KNOWN_HOSTS }}
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends sshpass
@@ -77,8 +77,8 @@ jobs:
       - name: Upload and activate
         env:
           SSHPASS: ${{ secrets.INFOMANIAK_SSH_PASSWORD }}
-          SSH_TARGET: ${{ vars.INFOMANIAK_SSH_USER }}@${{ vars.INFOMANIAK_SSH_HOST }}
-          SITE_DIR: ${{ vars.INFOMANIAK_SITE_DIR }}
+          SSH_TARGET: ${{ secrets.INFOMANIAK_SSH_USER }}@${{ secrets.INFOMANIAK_SSH_HOST }}
+          SITE_DIR: ${{ secrets.INFOMANIAK_SITE_DIR }}
           SITE_URL: ${{ vars.SITE_URL }}
         run: |
           dir="releases/$GITHUB_REF_NAME"
