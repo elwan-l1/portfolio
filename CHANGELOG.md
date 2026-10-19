@@ -6,6 +6,13 @@ section below as the GitHub release notes.
 
 ## [Unreleased]
 
+## [4.0.1] - 2026-10-19
+
+### Fixed
+
+- Deploys upload the release with scp and keep the SSH session open until activation ends, so
+  Infomaniak no longer cuts it off and the full output shows in the workflow log.
+
 ## [4.0.0] - 2026-10-18
 
 Full rewrite of the portfolio.
@@ -29,5 +36,6 @@ Full rewrite of the portfolio.
 
 - Rate limits on auth and blog views per client, and cross site server calls blocked.
 
-[Unreleased]: https://github.com/elwan-l1/portfolio/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/elwan-l1/portfolio/compare/v4.0.1...HEAD
+[4.0.1]: https://github.com/elwan-l1/portfolio/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/elwan-l1/portfolio/compare/v3.0.0...v4.0.0

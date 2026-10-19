@@ -81,9 +81,20 @@ jobs:
           SITE_DIR: ${{ secrets.INFOMANIAK_SITE_DIR }}
           SITE_URL: ${{ vars.SITE_URL }}
         run: |
+          archive="$GITHUB_REF_NAME.tgz"
           dir="releases/$GITHUB_REF_NAME"
-          tar -czf - -C release . | sshpass -e ssh "$SSH_TARGET" \
-            "cd '$SITE_DIR' && rm -rf '$dir' && mkdir -p '$dir' && tar -xzf - -C '$dir' && sh '$dir/activate.sh' '$GITHUB_REF_NAME' '$SITE_URL'"
+          tar -czf "$archive" -C release .
+          sshpass -e scp "$archive" "$SSH_TARGET:$SITE_DIR/$archive"
+
+          # Infomaniak's ContainerSSH ends the session as soon as its input closes,
+          # so ssh reads from a pipe that stays open until activate.sh is done
+          mkfifo ssh-input
+          sleep 1800 > ssh-input &
+          keep_open=$!
+          trap 'kill "$keep_open"' EXIT
+          sshpass -e ssh "$SSH_TARGET" \
+            "cd '$SITE_DIR' && rm -rf '$dir' && mkdir -p '$dir' && tar -xzf '$archive' -C '$dir' && rm '$archive' && sh '$dir/activate.sh' '$GITHUB_REF_NAME' '$SITE_URL'" \
+            < ssh-input
 
   release:
     name: GitHub release
