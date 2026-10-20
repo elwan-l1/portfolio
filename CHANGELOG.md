@@ -6,6 +6,20 @@ section below as the GitHub release notes.
 
 ## [Unreleased]
 
+## [4.0.2] - 2026-10-20
+
+### Added
+
+- Link preview image for the home page with Open Graph and Twitter card tags.
+
+### Fixed
+
+- Music starts on iPhone Safari: the audio is unlocked from the tap and plays with the silent switch on.
+
+### Removed
+
+- German and Italian languages.
+
 ## [4.0.1] - 2026-10-19
 
 ### Fixed
@@ -36,6 +50,7 @@ Full rewrite of the portfolio.
 
 - Rate limits on auth and blog views per client, and cross site server calls blocked.
 
-[Unreleased]: https://github.com/elwan-l1/portfolio/compare/v4.0.1...HEAD
+[Unreleased]: https://github.com/elwan-l1/portfolio/compare/v4.0.2...HEAD
+[4.0.2]: https://github.com/elwan-l1/portfolio/compare/v4.0.1...v4.0.2
 [4.0.1]: https://github.com/elwan-l1/portfolio/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/elwan-l1/portfolio/compare/v3.0.0...v4.0.0

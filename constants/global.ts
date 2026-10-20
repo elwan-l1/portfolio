@@ -1,4 +1,3 @@
-export const VERSION = "4.0.0";
 export const LANGUAGES = ["en", "fr"] as const;
 export type Locale = (typeof LANGUAGES)[number];
 
