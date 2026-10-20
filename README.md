@@ -1,6 +1,6 @@
 # Portfolio
 
-One page, four languages, content from MySQL. [TanStack Start](https://tanstack.com/start) on
+One page, two languages, content from MySQL. [TanStack Start](https://tanstack.com/start) on
 Vite and Nitro.
 
 ## Run

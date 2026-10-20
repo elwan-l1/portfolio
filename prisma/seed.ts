@@ -139,7 +139,7 @@ const blogPost = {
     "A tour of this portfolio, its style and what it can do, written with every piece of markdown the blog supports.",
   tags: ["meta", "design", "markdown"],
   publishedAt: new Date("2026-10-08T09:00:00Z"),
-  body: `This site is my portfolio: one page in four languages, and this blog. This post is a tour of how it is built, why it looks the way it does and what it can do. It also uses every piece of markdown the blog supports, so it doubles as the page I check the styling against.
+  body: `This site is my portfolio: one page in two languages, and this blog. This post is a tour of how it is built, why it looks the way it does and what it can do. It also uses every piece of markdown the blog supports, so it doubles as the page I check the styling against.
 
 ## What it is
 
@@ -195,7 +195,7 @@ The colours come from the theme, declared once as tokens:
 
 ## What it can do
 
-- [x] Speak English, French, German and Italian, picked from your browser
+- [x] Speak English and French, picked from your browser
 - [x] Leave a trail of glitching glyphs behind the cursor
 - [x] Open panels on my homelab, 3D printer, shaders, logos and FPV
 - [x] Run this blog, with tags, search and a most viewed order

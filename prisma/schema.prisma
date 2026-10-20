@@ -10,8 +10,6 @@ datasource db {
 enum Locale {
   en
   fr
-  de
-  it
 }
 
 enum ToolCategory {
