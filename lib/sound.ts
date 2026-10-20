@@ -73,6 +73,11 @@ const power = (dbs: Float32Array, [from, to]: number[]) => {
 export const startSound = async () => {
   // created before any await, so it still counts as part of the click that started it
   const ctx = new AudioContext();
+  // iOS unlocks audio only from a resume() inside the tap, and keeps web audio under the silent switch
+  // unless the session is "playback"; the track's download would otherwise outlast the tap
+  void ctx.resume();
+  const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+  if (session) session.type = "playback";
   const buffer = await ctx.decodeAudioData(await (await fetch(TRACK)).arrayBuffer());
 
   const source = new AudioBufferSourceNode(ctx, { buffer, loop: true });
