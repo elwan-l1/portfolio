@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { NotFound } from "@/components/not-found";
+
 import { fontCss, fontLinks } from "../fonts";
 import appCss from "../globals.css?url";
 import { HeadContent, Outlet, Scripts, createRootRoute, useParams } from "@tanstack/react-router";
@@ -23,6 +25,7 @@ export const Route = createRootRoute({
   }),
   shellComponent: RootDocument,
   component: Outlet,
+  notFoundComponent: NotFound,
 });
 
 function RootDocument({ children }: { children: ReactNode }) {
