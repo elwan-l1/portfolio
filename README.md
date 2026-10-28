@@ -1,11 +1,33 @@
 # Portfolio
 
-One page, two languages, content from MySQL. [TanStack Start](https://tanstack.com/start) on
-Vite and Nitro.
+![The portfolio home page](docs/screenshot.jpg)
+
+This repo contains the code for my portfolio at [elwan.ch](https://elwan.ch). It is a single page
+except for the blog and is available in English and French. Everything on the page is drawn as
+text and the content comes from a MySQL database.
+
+The site also has an admin part behind a login. It manages a todo board and generates the SVG
+cards I use in my GitHub README.
+
+## Art style
+
+There are no images. Every picture is real text in a monospace font.
+
+- Each picture is a grid of glyphs from light to dense: `▒ % $ # M W @ ▓ █`
+- The colors come from Catppuccin Mocha: white, mauve and pink
+- The art starts hidden in a wall of random glyphs. Drag the λ slider toward zero and the wall
+  wipes away
+- The sound button plays a track by Xav. Bass hits make the art glitch
+- The cursor leaves a trail of glitching letters
+- Art is stored in a compact text format in `assets/art`. `pnpm art` turns generator output
+  into that format
 
 ## Run
 
+You need Node 24 or newer, pnpm 11 and Docker.
+
 ```bash
+cp .env.example .env
 pnpm install
 pnpm db:up
 pnpm db:migrate
@@ -13,7 +35,35 @@ pnpm db:seed
 pnpm dev
 ```
 
-Production: `pnpm build`, then `pnpm start`. Both listen on port 2828.
+Open http://localhost:2828. The seed fills the database with the content.
+
+For production run `pnpm build` and then `pnpm start`. It listens on port 2828 too.
+
+## Commands
+
+| Command          | What it does                 |
+| ---------------- | ---------------------------- |
+| `pnpm dev`       | Dev server                   |
+| `pnpm build`     | Production build             |
+| `pnpm start`     | Run the build                |
+| `pnpm check`     | Format, lint and type checks |
+| `pnpm db:studio` | Browse the database          |
+
+## Built with
+
+[![TanStack Start](https://img.shields.io/badge/TanStack_Start-000000?style=flat)](https://tanstack.com/start)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)](https://vite.dev)
+[![Nitro](https://img.shields.io/badge/Nitro-00DC82?style=flat&logo=nitro&logoColor=white)](https://nitro.build)
+[![React](https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?style=flat&logo=prisma&logoColor=white)](https://www.prisma.io)
+[![MySQL](https://img.shields.io/badge/MySQL_9-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com)
+
+## Deploy
+
+Push a tag like `v4.0.2`. GitHub Actions copies the build to the server over SSH and publishes a
+GitHub release from `CHANGELOG.md`.
 
 ## Why TanStack Start instead of Next.js
 
