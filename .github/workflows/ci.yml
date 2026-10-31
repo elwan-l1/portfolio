@@ -29,7 +29,7 @@ jobs:
         uses: pnpm/action-setup@v6.1.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           cache: pnpm
@@ -38,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v10.2.0
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           enable-cache: false
 
@@ -67,7 +67,7 @@ jobs:
         uses: pnpm/action-setup@v6.1.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           cache: pnpm
